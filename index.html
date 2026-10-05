@@ -1,0 +1,2030 @@
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#090910" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>آرشیو محرمانه اسناد | مدیریت اختصاصی</title>
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #090910;
+      --card-bg: rgba(22, 22, 38, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(1200px 700px at 85% -10%, rgba(139, 92, 246, 0.2), transparent 60%),
+                  radial-gradient(1100px 600px at -10% 110%, rgba(6, 182, 212, 0.18), transparent 60%),
+                  radial-gradient(800px 400px at 50% 50%, rgba(244, 63, 94, 0.08), transparent 70%),
+                  var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glass {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-card {
+      background: rgba(26, 26, 46, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.25);
+    }
+
+    .grad-text {
+      background: linear-gradient(135deg, #c084fc, #38bdf8 50%, #f472b6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .grad-btn {
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      background-size: 200% 200%;
+      transition: all 0.35s ease;
+    }
+
+    .grad-btn:hover {
+      background-position: 100% 0;
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.45);
+      transform: scale(1.01);
+    }
+
+    .grad-btn-danger {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      transition: all 0.3s ease;
+    }
+
+    .grad-btn-danger:hover {
+      box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4);
+      transform: scale(1.02);
+    }
+
+    .input-field {
+      background: rgba(10, 10, 22, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.25s ease;
+      color: #fff;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+      background: rgba(15, 15, 30, 0.9);
+    }
+
+    .input-field:invalid:not(:placeholder-shown) {
+      border-color: #f43f5e;
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+      animation: blobFloat 16s ease-in-out infinite alternate;
+    }
+
+    @keyframes blobFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, -40px) scale(1.1); }
+      100% { transform: translate(-30px, 30px) scale(0.95); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.35); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.6); }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    .pdf-protected {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    .watermark-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(-35deg, transparent 0, transparent 180px, rgba(255,255,255,0.03) 180px, rgba(255,255,255,0.03) 182px);
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .watermark-overlay::after {
+      content: attr(data-watermark);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 28px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.05);
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: 4px;
+    }
+
+    canvas.pdf-page-canvas {
+      display: block;
+      margin: 0 auto;
+      border-radius: 8px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+      background-color: #ffffff;
+      max-width: 100%;
+      height: auto;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+    }
+
+    .nav-tab-btn {
+      position: relative;
+      transition: all 0.25s;
+    }
+
+    .nav-tab-btn.active {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    .nav-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      border-radius: 999px;
+    }
+
+    .status-online {
+      width: 10px;
+      height: 10px;
+      background: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Icon positioning fix */
+    .input-wrapper {
+      position: relative;
+    }
+    .input-wrapper .field-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .input-wrapper input {
+      padding-left: 42px !important;
+    }
+
+    /* PDF Pagination */
+    #pdfPageNav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(22, 22, 38, 0.75);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    #pdfPageNav button {
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+
+    #pdfPageNav button:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+
+    #pdfPageNav button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(22, 22, 38, 0.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    footer a {
+      color: #f472b6;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: #ec4899;
+    }
+
+    /* ===== MOBILE / PERFORMANCE ===== */
+    #pdfViewerModal {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    #viewerScrollArea {
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+    }
+
+    #pdfCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      contain: strict;
+    }
+
+    .glass, .glass-card {
+      contain: layout paint style;
+    }
+
+    .glass-card {
+      will-change: transform;
+    }
+
+    .upload-busy {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav-tab-btn.active::after { display: none; }
+      .nav-tab-btn.active { border-bottom: 2px solid #38bdf8; }
+
+      body {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .blob {
+        filter: blur(55px);
+        opacity: 0.18;
+        animation: none;
+      }
+
+      .glass {
+        backdrop-filter: blur(10px) saturate(125%);
+        -webkit-backdrop-filter: blur(10px) saturate(125%);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.04);
+      }
+
+      .glass-card {
+        backdrop-filter: blur(8px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+      }
+
+      .glass-card:hover {
+        transform: none;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+      }
+
+      #pdfViewerModal > .glass {
+        padding-top: max(0.65rem, env(safe-area-inset-top));
+      }
+
+      #pdfPageNav {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        padding-bottom: max(0.7rem, env(safe-area-inset-bottom));
+        gap: 0.5rem;
+      }
+
+      #pdfPageNav button {
+        min-height: 42px;
+        min-width: 42px;
+        padding-inline: 0.7rem;
+      }
+
+      #viewerScrollArea {
+        padding: 0.5rem;
+      }
+
+      #viewerScrollArea > div {
+        max-width: 100%;
+      }
+
+      #pdfGrid {
+        gap: 0.75rem;
+      }
+
+      input, select, button {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header .max-w-7xl {
+        padding-inline: 0.75rem;
+      }
+
+      #loginSection {
+        padding-inline: 0.75rem;
+      }
+
+      #pdfPageNav {
+        justify-content: space-between;
+      }
+
+      #pdfPageNav > button {
+        flex: 1;
+        max-width: 9rem;
+      }
+
+      #pageInput {
+        width: 2.75rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="pdf-protected relative flex flex-col min-h-screen">
+
+  <div class="blob" style="width: 550px; height: 550px; background: #7c3aed; top: -150px; right: -120px;"></div>
+  <div class="blob" style="width: 600px; height: 600px; background: #06b6d4; bottom: -180px; left: -160px; animation-delay: -5s;"></div>
+  <div class="blob" style="width: 400px; height: 400px; background: #ec4899; top: 40%; left: 30%; animation-delay: -9s;"></div>
+
+  <!-- Toast -->
+  <div id="toastContainer" class="fixed top-5 left-5 z-[200] flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
+
+  <!-- ====================== -->
+  <!-- 1. LOGIN / REGISTER    -->
+  <!-- ====================== -->
+  <section id="loginSection" class="min-h-screen flex flex-col items-center justify-center p-4 relative z-10 flex-1">
+    
+    <div class="flex gap-2 mb-8">
+      <button id="loginTabBtn" class="px-6 py-2 rounded-full font-bold text-sm text-white bg-violet-600/40 border border-violet-500/50 transition">ورود</button>
+      <button id="registerTabBtn" class="px-6 py-2 rounded-full font-bold text-sm text-gray-400 hover:text-white border border-white/10 transition">ثبت‌نام</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="glass w-full max-w-md rounded-3xl p-6 sm:p-10 fade-in border border-white/10 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-cyan-400 to-pink-500"></div>
+
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="w-18 h-18 p-4 rounded-2xl grad-btn flex items-center justify-center mb-4 shadow-xl shadow-violet-900/40">
+          <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-extrabold grad-text tracking-tight">آرشیو محرمانه</h1>
+        <p class="text-xs sm:text-sm text-gray-400 mt-2 leading-relaxed">سامانه حفاظت‌شده مدیریت اسناد دیجیتال</p>
+      </div>
+
+      <form id="loginFormElement" class="space-y-5">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">نام کاربری</label>
+          <div class="input-wrapper">
+            <span class="field-icon">👤</span>
+            <input id="loginUsername" type="text" required dir="ltr" class="input-field w-full px-4 py-3 rounded-xl text-left text-sm" placeholder="نام کاربری" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">رمز عبور</label>
+          <div class="input-wrapper">
+            <span class="field-icon">🔐</span>
+            <input id="loginPassword" type="password" required dir="ltr" class="input-field w-full px-4 py-3 rounded-xl text-left text-sm" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <button type="submit" class="grad-btn w-full py-3.5 rounded-xl font-bold text-white text-sm shadow-lg mt-2">
+          ورود به سامانه
+        </button>
+      </form>
+
+      <p class="text-center text-xs text-gray-400 mt-4">
+        حساب ندارید؟ <button id="switchToRegister" class="text-cyan-400 hover:text-cyan-300 font-bold transition">ثبت‌نام</button>
+      </p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" class="hidden glass w-full max-w-md rounded-3xl p-6 sm:p-10 fade-in border border-white/10 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-cyan-400 to-violet-500"></div>
+
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="w-18 h-18 p-4 rounded-2xl grad-btn flex items-center justify-center mb-4 shadow-xl shadow-violet-900/40">
+          <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-extrabold grad-text tracking-tight">ثبت‌نام کاربر جدید</h1>
+        <p class="text-xs sm:text-sm text-gray-400 mt-2 leading-relaxed">حساب امن خود را ایجاد کنید</p>
+      </div>
+
+      <form id="registerFormElement" class="space-y-5">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">نام کاربری (حداقل ۳ حرف)</label>
+          <div class="input-wrapper">
+            <span class="field-icon">👤</span>
+            <input id="regUsername" type="text" required dir="ltr" minlength="3" class="input-field w-full px-4 py-3 rounded-xl text-left text-sm" placeholder="نام کاربری" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">رمز عبور (حداقل ۶ حرف)</label>
+          <div class="input-wrapper">
+            <span class="field-icon">🔐</span>
+            <input id="regPassword" type="password" required dir="ltr" minlength="6" class="input-field w-full px-4 py-3 rounded-xl text-left text-sm" placeholder="رمز قوی انتخاب کنید" />
+          </div>
+          <p class="text-[11px] text-gray-500 mt-1">💡 حروف + اعداد</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">تکرار رمز عبور</label>
+          <div class="input-wrapper">
+            <span class="field-icon">🔐</span>
+            <input id="regPasswordConfirm" type="password" required dir="ltr" minlength="6" class="input-field w-full px-4 py-3 rounded-xl text-left text-sm" placeholder="تکرار رمز" />
+          </div>
+        </div>
+
+        <button type="submit" class="grad-btn w-full py-3.5 rounded-xl font-bold text-white text-sm shadow-lg mt-2">
+          ثبت‌نام
+        </button>
+      </form>
+
+      <div class="mt-5 p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300 leading-relaxed">
+        <p class="font-bold flex items-center gap-2">
+          <span>✓</span> پس از ثبت‌نام، درخواست شما ثبت‌شده و پس از بررسی مدیریت، حساب فعال خواهد شد.
+        </p>
+      </div>
+
+      <p class="text-center text-xs text-gray-400 mt-4">
+        قبلاً ثبت‌نام کرده‌اید؟ <button id="switchToLogin" class="text-cyan-400 hover:text-cyan-300 font-bold transition">وارد شوید</button>
+      </p>
+    </div>
+  </section>
+
+  <!-- ====================== -->
+  <!-- 2. MAIN APP            -->
+  <!-- ====================== -->
+  <div id="appContainer" class="hidden min-h-screen flex flex-col relative z-10 flex-1">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-40 border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-3">
+        
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-xl grad-btn flex items-center justify-center shadow-md shrink-0">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="font-black text-base sm:text-lg text-white">آرشیو محرمانه</h2>
+              <span id="roleBadge" class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 shrink-0">نقش</span>
+            </div>
+            <p id="currentUserDisplay" class="text-[10px] sm:text-xs text-gray-400 font-mono"></p>
+          </div>
+        </div>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center gap-4 sm:gap-8 text-xs sm:text-sm">
+          <button data-tab="library" class="nav-tab-btn active text-gray-300 hover:text-white flex items-center gap-1.5 sm:gap-2 py-1">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            کتابخانه
+          </button>
+          <button data-tab="admin" id="adminNavBtn" class="nav-tab-btn text-gray-300 hover:text-white flex items-center gap-1.5 sm:gap-2 py-1">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            مدیریت
+          </button>
+        </nav>
+
+        <!-- Right Buttons -->
+        <div class="flex items-center gap-2">
+          <button id="quickAddDocBtn" class="hidden items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-violet-600/30 text-violet-200 hover:bg-violet-600/50 border border-violet-500/40 transition sm:flex">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <span class="hidden md:inline">افزودن</span>
+          </button>
+
+          <button id="logoutBtn" class="flex items-center gap-1.5 text-xs font-semibold px-2.5 sm:px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 transition">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span class="hidden sm:inline">خروج</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Tabs -->
+      <div class="md:hidden flex border-t border-white/5 px-3 pt-2 pb-2 gap-2 overflow-x-auto">
+        <button data-tab="library" class="nav-tab-btn active text-xs text-gray-300 py-1 whitespace-nowrap">کتابخانه</button>
+        <button data-tab="admin" id="adminNavBtnMobile" class="nav-tab-btn text-xs text-gray-300 py-1 whitespace-nowrap">مدیریت</button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8">
+
+      <!-- ===== LIBRARY TAB ===== -->
+      <main id="libraryTab" class="fade-in space-y-4 sm:space-y-6">
+        <div class="glass p-3 sm:p-5 rounded-2xl flex flex-col gap-4">
+          <div>
+            <h1 class="text-lg sm:text-2xl font-black text-white flex items-center gap-2 flex-wrap">
+              <span>اسناد محافظت‌شده</span>
+              <span id="docCountBadge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">۰ فایل</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1">مشاهده با واترمارک (چاپ، کپی و دانلود مسدود)</p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div class="relative flex-1">
+              <input id="searchInput" type="text" placeholder="جستجو..." class="input-field w-full pr-10 pl-3 py-2.5 rounded-xl text-xs sm:text-sm placeholder-gray-500" />
+              <svg class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+
+            <select id="categoryFilter" class="input-field px-3 py-2.5 rounded-xl text-xs sm:text-sm text-gray-300">
+              <option value="all">همه دسته‌ها</option>
+              <option value="محرمانه">محرمانه</option>
+              <option value="فنی و مهندسی">فنی و مهندسی</option>
+              <option value="مالی و حقوقی">مالی و حقوقی</option>
+              <option value="عمومی">عمومی</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="pdfGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5"></div>
+
+        <div id="emptyLibraryState" class="hidden text-center py-16 sm:py-24 glass rounded-3xl p-6 sm:p-8">
+          <div class="w-16 sm:w-20 h-16 sm:h-20 mx-auto rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-3xl sm:text-4xl mb-4">📂</div>
+          <h3 class="text-base sm:text-lg font-bold text-gray-300">سندی یافت نشد</h3>
+          <p class="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto mt-2">سند جدید اضافه کنید یا جستجو را تغییر دهید.</p>
+        </div>
+      </main>
+
+      <!-- ===== ADMIN TAB ===== -->
+      <main id="adminTab" class="hidden fade-in space-y-4 sm:space-y-6">
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div class="glass p-4 rounded-2xl flex items-center justify-between border-violet-500/20">
+            <div><p class="text-xs text-gray-400 font-medium">کل اسناد</p><h3 id="statTotalPdfs" class="text-2xl font-black text-white mt-1">0</h3></div>
+            <div class="w-12 h-12 rounded-xl bg-violet-500/20 text-violet-300 flex items-center justify-center text-xl">📄</div>
+          </div>
+          <div class="glass p-4 rounded-2xl flex items-center justify-between border-cyan-500/20">
+            <div><p class="text-xs text-gray-400 font-medium">منتظر تأیید</p><h3 id="statPendingUsers" class="text-2xl font-black text-amber-400 mt-1">0</h3></div>
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-xl">⏳</div>
+          </div>
+          <div class="glass p-4 rounded-2xl flex items-center justify-between border-emerald-500/20">
+            <div><p class="text-xs text-gray-400 font-medium">کاربران آنلاین</p><h3 id="statOnlineUsers" class="text-2xl font-black text-emerald-400 mt-1">0</h3></div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xl">🟢</div>
+          </div>
+          <div class="glass p-4 rounded-2xl flex items-center justify-between border-rose-500/20">
+            <div><p class="text-xs text-gray-400 font-medium">امنیت</p><h3 class="text-sm font-bold text-emerald-400 mt-2">✓ فعال</h3></div>
+            <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center text-xl">🛡️</div>
+          </div>
+        </div>
+
+        <!-- Online Users Section (Admin Only) -->
+        <div class="glass rounded-3xl p-4 sm:p-6 border border-emerald-500/20">
+          <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-white/10">
+            <span class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center">🟢</span>
+            <div>
+              <h2 class="font-bold text-sm sm:text-base text-white">کاربران آنلاین</h2>
+              <p class="text-[10px] sm:text-xs text-gray-400">مشاهده وضعیت کاربران متصل</p>
+            </div>
+          </div>
+          <div id="onlineUsersList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+
+        <!-- 2 Column Panel -->
+        <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
+
+          <!-- Users Management -->
+          <div class="glass rounded-3xl p-4 sm:p-6">
+            <div class="flex items-center justify-between pb-3 sm:pb-4 mb-4 border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <span class="w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-sm">👤</span>
+                <div class="min-w-0">
+                  <h2 class="font-bold text-sm sm:text-base text-white">مدیریت کاربران</h2>
+                  <p class="text-[10px] sm:text-xs text-gray-400">تأیید، رد و حذف</p>
+                </div>
+              </div>
+              <span id="pendingUsersBadge" class="text-xs bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full font-bold shrink-0">۰</span>
+            </div>
+
+            <!-- Pending Users -->
+            <div class="mb-6">
+              <h3 class="text-xs font-bold text-amber-300 mb-3 flex items-center gap-1"><span>⏳</span> درخواست‌های منتظر تأیید</h3>
+              <div id="pendingUsersContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Add User -->
+            <form id="addUserForm" class="p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3 mb-4 sm:mb-6">
+              <p class="text-xs font-bold text-cyan-300 flex items-center gap-1"><span>+</span> ایجاد کاربر مستقیم</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[10px] sm:text-xs text-gray-300 mb-1">نام کاربری</label>
+                  <div class="input-wrapper">
+                    <span class="field-icon">👤</span>
+                    <input id="newUsername" type="text" required dir="ltr" class="input-field w-full px-3 py-2 rounded-xl text-xs placeholder-gray-500 text-left" placeholder="username" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[10px] sm:text-xs text-gray-300 mb-1">رمز عبور</label>
+                  <div class="input-wrapper">
+                    <span class="field-icon">🔐</span>
+                    <input id="newPassword" type="password" required dir="ltr" class="input-field w-full px-3 py-2 rounded-xl text-xs placeholder-gray-500 text-left" placeholder="رمز" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[10px] sm:text-xs text-gray-300 mb-1">نقش</label>
+                  <select id="newUserRole" class="input-field w-full px-3 py-2 rounded-xl text-xs text-gray-200">
+                    <option value="user">کاربر عادی</option>
+                    <option value="admin">مدیر</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="grad-btn w-full py-2.5 rounded-xl text-xs font-bold text-white shadow-md">ثبت کاربر</button>
+            </form>
+
+            <!-- Active Users -->
+            <h3 class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1"><span>✓</span> کاربران فعال</h3>
+            <div id="usersListContainer" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+          </div>
+
+          <!-- PDF Management (ADMIN ONLY) -->
+          <div id="adminPdfSection" class="glass rounded-3xl p-4 sm:p-6">
+            <div class="flex items-center justify-between pb-3 sm:pb-4 mb-4 border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <span class="w-8 sm:w-9 h-8 sm:h-9 rounded-xl bg-violet-500/20 text-violet-300 flex items-center justify-center font-bold text-sm">📄</span>
+                <div class="min-w-0">
+                  <h2 class="font-bold text-sm sm:text-base text-white">مدیریت فایل‌ها</h2>
+                  <p class="text-[10px] sm:text-xs text-gray-400">بارگذاری و حذف</p>
+                </div>
+              </div>
+              <span id="pdfListBadge" class="text-xs bg-violet-500/20 text-violet-300 px-2.5 py-1 rounded-full font-bold shrink-0">۰</span>
+            </div>
+
+            <form id="addPdfForm" class="p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3 mb-4 sm:mb-6">
+              <p class="text-xs font-bold text-violet-300 flex items-center gap-1"><span>+</span> بارگذاری سند</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[10px] sm:text-xs text-gray-300 mb-1">عنوان سند</label>
+                  <input id="pdfTitleInput" type="text" required class="input-field w-full px-3 py-2 rounded-xl text-xs placeholder-gray-500" placeholder="عنوان" />
+                </div>
+                <div>
+                  <label class="block text-[10px] sm:text-xs text-gray-300 mb-1">دسته‌بندی</label>
+                  <select id="pdfCategoryInput" class="input-field w-full px-3 py-2 rounded-xl text-xs text-gray-200">
+                    <option value="محرمانه">محرمانه</option>
+                    <option value="فنی و مهندسی">فنی و مهندسی</option>
+                    <option value="مالی و حقوقی">مالی و حقوقی</option>
+                    <option value="عمومی">عمومی</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] sm:text-xs text-gray-300 mb-1">شیوه بارگذاری</label>
+                  <div class="grid grid-cols-2 gap-2 mb-2">
+                    <button type="button" id="tabUploadFile" class="py-1.5 rounded-lg text-xs font-semibold bg-violet-600/30 text-violet-200 border border-violet-500/40 transition">📤 آپلود</button>
+                    <button type="button" id="tabUploadUrl" class="py-1.5 rounded-lg text-xs font-semibold bg-white/5 text-gray-400 border border-white/10 hover:text-white transition">🔗 URL</button>
+                  </div>
+                  <div id="fileUploadZone" class="border border-dashed border-violet-500/40 rounded-xl p-3 text-center cursor-pointer bg-violet-950/10 hover:bg-violet-950/20 transition">
+                    <input id="pdfFileInput" type="file" accept="application/pdf" class="hidden" />
+                    <div id="fileZoneContent" class="text-xs">
+                      <p class="text-gray-300 font-medium">کلیک برای آپلود PDF</p>
+                      <p class="text-[10px] text-gray-500 mt-1">حداکثر ۱۵ مگابایت</p>
+                    </div>
+                    <div id="fileZoneSelected" class="hidden text-xs text-violet-300 font-semibold"><span>✓</span> <span id="selectedFileName">file.pdf</span></div>
+                  </div>
+                  <div id="urlUploadZone" class="hidden">
+                    <input id="pdfUrlInput" type="url" dir="ltr" class="input-field w-full px-3 py-2 rounded-xl text-xs placeholder-gray-500 text-left" placeholder="https://..." />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="grad-btn w-full py-2.5 rounded-xl text-xs font-bold text-white shadow-md">بارگذاری سند</button>
+            </form>
+
+            <h3 class="text-xs font-bold text-gray-300 mb-2">اسناد ثبت‌شده</h3>
+            <div id="adminPdfListContainer" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ===== QUICK ADD MODAL (ADMIN ONLY) ===== -->
+  <div id="quickAddModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass w-full max-w-md rounded-3xl p-5 sm:p-7 relative border border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+        <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2"><span>📄</span> افزودن سند</h3>
+        <button id="closeQuickAddModal" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">✕</button>
+      </div>
+      <form id="modalPdfForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2">عنوان سند</label>
+          <input id="modalPdfTitle" type="text" required class="input-field w-full px-3.5 py-2.5 rounded-xl text-xs placeholder-gray-500" placeholder="عنوان سند" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2">دسته‌بندی</label>
+          <select id="modalPdfCategory" class="input-field w-full px-3.5 py-2.5 rounded-xl text-xs text-gray-200">
+            <option value="محرمانه">محرمانه</option>
+            <option value="فنی و مهندسی">فنی و مهندسی</option>
+            <option value="مالی و حقوقی">مالی و حقوقی</option>
+            <option value="عمومی">عمومی</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2">فایل PDF</label>
+          <label class="input-field flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs cursor-pointer hover:border-violet-500 transition">
+            <svg class="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span id="modalFileName">انتخاب فایل...</span>
+            <input id="modalPdfFile" type="file" accept="application/pdf" required class="hidden" />
+          </label>
+        </div>
+        <button type="submit" class="grad-btn w-full py-3 rounded-xl text-xs font-bold text-white shadow-lg">ثبت سند</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== DELETE MODAL ===== -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass w-full max-w-sm rounded-3xl p-6 text-center border border-rose-500/30 shadow-2xl">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl mb-4">⚠️</div>
+      <h3 id="deleteModalTitle" class="text-base font-bold text-white">تأیید حذف</h3>
+      <p id="deleteModalDesc" class="text-xs text-gray-400 mt-2 leading-relaxed">آیا مطمئن هستید؟</p>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button id="cancelDeleteBtn" class="py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-gray-300 transition">انصراف</button>
+        <button id="confirmDeleteBtn" class="grad-btn-danger py-2.5 rounded-xl text-xs font-bold text-white shadow-lg">حذف شود</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHANGE PASSWORD MODAL (ADMIN ONLY) ===== -->
+  <div id="changePasswordModal" class="fixed inset-0 z-[160] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass w-full max-w-md rounded-3xl p-5 sm:p-7 relative border border-cyan-500/20 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 mb-5 border-b border-white/10">
+        <div>
+          <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2"><span>🔐</span> تغییر رمز عبور</h3>
+          <p id="changePasswordUserLabel" class="text-[10px] sm:text-xs text-gray-400 mt-1"></p>
+        </div>
+        <button id="closeChangePasswordModal" type="button" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">✕</button>
+      </div>
+
+      <form id="changePasswordForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2">رمز عبور جدید</label>
+          <div class="input-wrapper">
+            <span class="field-icon">🔐</span>
+            <input id="changePasswordNew" type="password" required minlength="6" dir="ltr" class="input-field w-full px-3.5 py-2.5 rounded-xl text-xs text-left" placeholder="حداقل ۶ کاراکتر" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-2">تکرار رمز عبور جدید</label>
+          <div class="input-wrapper">
+            <span class="field-icon">🔐</span>
+            <input id="changePasswordConfirm" type="password" required minlength="6" dir="ltr" class="input-field w-full px-3.5 py-2.5 rounded-xl text-xs text-left" placeholder="تکرار رمز جدید" />
+          </div>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button id="cancelChangePasswordBtn" type="button" class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-gray-300 transition">انصراف</button>
+          <button type="submit" class="flex-1 grad-btn py-2.5 rounded-xl text-xs font-bold text-white shadow-lg">ذخیره رمز جدید</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== PDF VIEWER (PAGE BY PAGE) ===== -->
+  <div id="pdfViewerModal" class="fixed inset-0 z-[150] bg-[#090910]/95 backdrop-blur-xl hidden flex flex-col">
+    <div class="glass border-b border-white/10 px-3 sm:px-4 py-3 flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <button id="closeViewerBtn" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition shrink-0">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <div class="min-w-0">
+          <h2 id="viewerDocTitle" class="text-xs sm:text-sm font-bold text-white truncate">نام سند</h2>
+          <span class="text-[9px] text-gray-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> محافظت فعال</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+        <button id="zoomOutBtn" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 flex items-center justify-center text-xs font-bold transition">−</button>
+        <span id="zoomLevelDisplay" class="text-xs font-mono text-cyan-300 w-10 text-center">160%</span>
+        <button id="zoomInBtn" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 flex items-center justify-center text-xs font-bold transition">+</button>
+      </div>
+    </div>
+    <div id="viewerScrollArea" class="flex-1 overflow-auto relative p-3 sm:p-8 flex justify-center bg-[#07070d]">
+      <div class="relative w-full max-w-2xl">
+        <canvas id="pdfCanvas" class="w-full border border-white/10 rounded-lg shadow-2xl"></canvas>
+        <div id="viewerWatermark" class="watermark-overlay" data-watermark="محرمانه"></div>
+      </div>
+    </div>
+    <!-- Page Navigation -->
+    <div id="pdfPageNav">
+      <button id="prevPageBtn" class="px-4 py-2 rounded-lg font-bold text-white">← صفحه قبل</button>
+      <div class="flex items-center gap-2">
+        <input id="pageInput" type="number" min="1" value="1" class="w-12 px-2 py-1 rounded-lg bg-white/10 border border-white/20 text-white text-center text-xs">
+        <span id="totalPages" class="text-xs text-gray-400">/ 0</span>
+      </div>
+      <button id="nextPageBtn" class="px-4 py-2 rounded-lg font-bold text-white">صفحه بعد →</button>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="z-10">
+    Made With 💛 By <a href="https://t.me/infected_humen" target="_blank" rel="noopener noreferrer">INFECTED</a>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    /* ===== LAZY PDF.JS LOADER ===== */
+    let pdfJsLoadPromise = null;
+    let activePdfObjectUrl = null;
+
+    function ensurePdfJs() {
+      if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+      if (pdfJsLoadPromise) return pdfJsLoadPromise;
+
+      pdfJsLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        script.async = true;
+        script.onload = () => {
+          if (!window.pdfjsLib) {
+            reject(new Error('PDF.js failed to initialize'));
+            return;
+          }
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          resolve(pdfjsLib);
+        };
+        script.onerror = () => reject(new Error('PDF.js load failed'));
+        document.head.appendChild(script);
+      });
+
+      return pdfJsLoadPromise;
+    }
+
+    /* ===== STORAGE ===== */
+    const STORAGE_KEYS = {
+      USERS: 'arsh_users_v5',
+      PENDING_USERS: 'arsh_pending_v5',
+      PDFS: 'arsh_pdfs_v5',
+      SESSION: 'arsh_session_v5',
+      ONLINE_USERS: 'arsh_online_v5'
+    };
+
+    /* ===== DB ===== */
+    const DB = {
+      getUsers: () => {
+        let raw = localStorage.getItem(STORAGE_KEYS.USERS);
+        let users = raw ? JSON.parse(raw) : [];
+        const hasAdmin = users.find(u => u.id === 'u_master_admin');
+        if (!hasAdmin) {
+          users.unshift({
+            id: 'u_master_admin',
+            username: 'admin_master_system',
+            password: 'SecureAdminPass2024!',
+            role: 'admin',
+            createdAt: Date.now(),
+            status: 'approved'
+          });
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+        }
+        return users;
+      },
+      setUsers: (users) => localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users)),
+
+      getPendingUsers: () => {
+        const raw = localStorage.getItem(STORAGE_KEYS.PENDING_USERS);
+        return raw ? JSON.parse(raw) : [];
+      },
+      setPendingUsers: (users) => localStorage.setItem(STORAGE_KEYS.PENDING_USERS, JSON.stringify(users)),
+
+      getPdfs: () => {
+        const raw = localStorage.getItem(STORAGE_KEYS.PDFS);
+        return raw ? JSON.parse(raw) : [];
+      },
+      setPdfs: (pdfs) => localStorage.setItem(STORAGE_KEYS.PDFS, JSON.stringify(pdfs)),
+
+      getSession: () => JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || 'null'),
+      setSession: (session) => localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session)),
+      clearSession: () => localStorage.removeItem(STORAGE_KEYS.SESSION),
+
+      getOnlineUsers: () => {
+        const raw = localStorage.getItem(STORAGE_KEYS.ONLINE_USERS);
+        return raw ? JSON.parse(raw) : [];
+      },
+      setOnlineUsers: (users) => localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(users))
+    };
+
+    /* ===== PDF BINARY STORE (IndexedDB) ===== */
+    const PDF_DB_NAME = 'arsh_pdf_store_v1';
+    const PDF_DB_VERSION = 1;
+    const PDF_STORE_NAME = 'files';
+    let pdfMetaCache = null;
+
+    const PdfBlobStore = {
+      open() {
+        return new Promise((resolve, reject) => {
+          if (!('indexedDB' in window)) {
+            reject(new Error('IndexedDB is not supported'));
+            return;
+          }
+          const request = indexedDB.open(PDF_DB_NAME, PDF_DB_VERSION);
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(PDF_STORE_NAME)) {
+              db.createObjectStore(PDF_STORE_NAME);
+            }
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error || new Error('IndexedDB open failed'));
+        });
+      },
+
+      async put(key, blob) {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
+          tx.objectStore(PDF_STORE_NAME).put(blob, key);
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB write failed')); };
+          tx.onabort = () => { db.close(); reject(tx.error || new Error('IndexedDB write aborted')); };
+        });
+      },
+
+      async get(key) {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(PDF_STORE_NAME, 'readonly');
+          const request = tx.objectStore(PDF_STORE_NAME).get(key);
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => reject(request.error || new Error('IndexedDB read failed'));
+          tx.oncomplete = () => db.close();
+          tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB read failed')); };
+        });
+      },
+
+      async delete(key) {
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
+          tx.objectStore(PDF_STORE_NAME).delete(key);
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB delete failed')); };
+        });
+      }
+    };
+
+    function getPdfMeta() {
+      if (!pdfMetaCache) {
+        const raw = localStorage.getItem(STORAGE_KEYS.PDFS);
+        pdfMetaCache = raw ? JSON.parse(raw) : [];
+      }
+      return pdfMetaCache;
+    }
+
+    function setPdfMeta(pdfs) {
+      pdfMetaCache = pdfs;
+      localStorage.setItem(STORAGE_KEYS.PDFS, JSON.stringify(pdfs));
+    }
+
+    // Replace repeated JSON parsing for the PDF catalog with the in-memory metadata cache.
+    DB.getPdfs = () => getPdfMeta();
+    DB.setPdfs = (pdfs) => setPdfMeta(pdfs);
+
+    async function migrateLegacyPdfData() {
+      const pdfs = getPdfMeta();
+      let changed = false;
+
+      for (const pdf of pdfs) {
+        if (pdf && pdf.data && !pdf.storage) {
+          try {
+            const response = await fetch(pdf.data);
+            const blob = await response.blob();
+            await PdfBlobStore.put(pdf.id, blob);
+            delete pdf.data;
+            pdf.storage = 'indexeddb';
+            changed = true;
+          } catch (err) {
+            console.warn('Legacy PDF migration failed:', pdf.id, err);
+          }
+        }
+      }
+
+      if (changed) setPdfMeta(pdfs);
+    }
+
+    /* ===== STATE ===== */
+    let currentUser = DB.getSession();
+    let currentTab = 'library';
+    let deleteActionCallback = null;
+
+    // PDF Viewer State
+    let activePdfDoc = null;
+    let currentPageNum = 1;
+    let activeZoomScale = 1.75; // نمایش با کیفیت بالاتر
+
+    /* ===== TOAST ===== */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const styles = {
+        success: 'bg-emerald-950/80 border-emerald-500/50 text-emerald-200',
+        error: 'bg-rose-950/80 border-rose-500/50 text-rose-200',
+        info: 'bg-cyan-950/80 border-cyan-500/50 text-cyan-200',
+        warning: 'bg-amber-950/80 border-amber-500/50 text-amber-200'
+      };
+      const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
+      toast.className = `glass border ${styles[type] || styles.info} p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2.5 shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `<span class="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center shrink-0">${icons[type] || 'ℹ'}</span><span class="flex-1 leading-snug">${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-x-12', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('translate-x-12', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    /* ===== FORM VALIDATION ===== */
+    document.addEventListener('invalid', (e) => {
+      e.preventDefault();
+      showToast('لطفا فیلد‌های خالی را پر کنید', 'warning');
+    }, true);
+
+    // Check for empty inputs before form submission
+    function validateForm(form) {
+      const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+      for (let input of inputs) {
+        if (!input.value.trim()) {
+          input.focus();
+          showToast('لطفا تمام فیلدهای اجباری را پر کنید', 'warning');
+          return false;
+        }
+      }
+      return true;
+    }
+
+    /* ===== AUTH ===== */
+    function initAuth() {
+      if (currentUser && currentUser.id) {
+        renderApp();
+        updateOnlineStatus();
+      } else {
+        renderLogin();
+      }
+    }
+
+    function renderLogin() {
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('appContainer').classList.add('hidden');
+    }
+
+    function renderApp() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('appContainer').classList.remove('hidden');
+
+      const roleText = currentUser.role === 'admin' ? '🔐 مدیر ارشد' : '👤 کاربر عادی';
+      document.getElementById('currentUserDisplay').textContent = currentUser.username;
+      document.getElementById('roleBadge').textContent = roleText;
+
+      const isAdmin = currentUser.role === 'admin';
+      
+      document.getElementById('adminNavBtn').classList.toggle('hidden', !isAdmin);
+      document.getElementById('adminNavBtnMobile').classList.toggle('hidden', !isAdmin);
+      document.getElementById('quickAddDocBtn').style.display = isAdmin ? 'flex' : 'none';
+
+      renderLibrary();
+      if (isAdmin) {
+        renderAdmin();
+      }
+    }
+
+    /* ===== LOGIN / REGISTER TABS ===== */
+    document.getElementById('loginTabBtn').addEventListener('click', () => {
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('registerForm').classList.add('hidden');
+      document.getElementById('loginTabBtn').className = 'px-6 py-2 rounded-full font-bold text-sm text-white bg-violet-600/40 border border-violet-500/50 transition';
+      document.getElementById('registerTabBtn').className = 'px-6 py-2 rounded-full font-bold text-sm text-gray-400 hover:text-white border border-white/10 transition';
+    });
+
+    document.getElementById('registerTabBtn').addEventListener('click', () => {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('registerForm').classList.remove('hidden');
+      document.getElementById('registerTabBtn').className = 'px-6 py-2 rounded-full font-bold text-sm text-white bg-violet-600/40 border border-violet-500/50 transition';
+      document.getElementById('loginTabBtn').className = 'px-6 py-2 rounded-full font-bold text-sm text-gray-400 hover:text-white border border-white/10 transition';
+    });
+
+    document.getElementById('switchToRegister').addEventListener('click', () => document.getElementById('registerTabBtn').click());
+    document.getElementById('switchToLogin').addEventListener('click', () => document.getElementById('loginTabBtn').click());
+
+    /* ===== LOGIN ===== */
+    document.getElementById('loginFormElement').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      if (!validateForm(document.getElementById('loginFormElement'))) return;
+
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const users = DB.getUsers();
+      const foundUser = users.find(u => u.username === username && u.password === password);
+
+      if (foundUser) {
+        const role = (foundUser.id === 'u_master_admin') ? 'admin' : foundUser.role;
+        currentUser = { id: foundUser.id, username: foundUser.username, role: role };
+        DB.setSession(currentUser);
+        showToast(`خوش آمدید ${currentUser.username}!`, 'success');
+        document.getElementById('loginFormElement').reset();
+        renderApp();
+        updateOnlineStatus();
+      } else {
+        const pendingUsers = DB.getPendingUsers();
+        const pendingUser = pendingUsers.find(u => u.username === username && u.password === password);
+        if (pendingUser) {
+          showToast('حساب شما هنوز توسط مدیر تأیید نشده است ⏳', 'warning');
+        } else {
+          showToast('نام کاربری یا رمز عبور اشتباه است', 'error');
+        }
+      }
+    });
+
+    /* ===== REGISTER ===== */
+    document.getElementById('registerFormElement').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      if (!validateForm(document.getElementById('registerFormElement'))) return;
+
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm = document.getElementById('regPasswordConfirm').value;
+
+      if (username.length < 3) { showToast('نام کاربری حداقل ۳ حرف', 'error'); return; }
+      if (password.length < 6) { showToast('رمز حداقل ۶ حرف', 'error'); return; }
+      if (!/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
+        showToast('رمز باید حروف + اعداد داشته باشد', 'error');
+        return;
+      }
+      if (password !== confirm) { showToast('رمزها مطابقت ندارند', 'error'); return; }
+
+      const users = DB.getUsers();
+      const pending = DB.getPendingUsers();
+
+      if (users.some(u => u.username === username)) {
+        showToast('این نام کاربری قبلاً ثبت شده', 'warning');
+        return;
+      }
+      if (pending.some(u => u.username === username)) {
+        showToast('درخواست این نام کاربری در حال بررسی است', 'warning');
+        return;
+      }
+
+      pending.push({
+        id: 'pending_' + Date.now(),
+        username,
+        password,
+        role: 'user',
+        createdAt: Date.now(),
+        status: 'pending'
+      });
+      DB.setPendingUsers(pending);
+
+      showToast('✓ ثبت‌نام انجام شد! پس از بررسی مدیریت، حساب شما فعال می‌شود.', 'success');
+      document.getElementById('registerFormElement').reset();
+      document.getElementById('loginTabBtn').click();
+    });
+
+    /* ===== LOGOUT ===== */
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      removeUserFromOnline();
+      DB.clearSession();
+      currentUser = null;
+      showToast('خارج شدید', 'info');
+      renderLogin();
+    });
+
+    /* ===== ONLINE STATUS ===== */
+    function updateOnlineStatus() {
+      if (!currentUser) return;
+      const onlineUsers = DB.getOnlineUsers();
+      const existing = onlineUsers.find(u => u.id === currentUser.id);
+      const users = DB.getUsers();
+      const dbUser = users.find(u => u.id === currentUser.id);
+
+      if (!existing) {
+        onlineUsers.push({
+          id: currentUser.id,
+          username: currentUser.username,
+          role: currentUser.role,
+          password: dbUser ? dbUser.password : '***',
+          lastSeen: Date.now(),
+          loginTime: Date.now()
+        });
+      } else {
+        existing.lastSeen = Date.now();
+      }
+      DB.setOnlineUsers(onlineUsers);
+      updateOnlineUI();
+    }
+
+    function removeUserFromOnline() {
+      if (!currentUser) return;
+      const onlineUsers = DB.getOnlineUsers();
+      DB.setOnlineUsers(onlineUsers.filter(u => u.id !== currentUser.id));
+    }
+
+    function updateOnlineUI() {
+      const onlineUsers = DB.getOnlineUsers().filter(u => Date.now() - u.lastSeen < 5 * 60 * 1000);
+      if (currentUser && currentUser.role === 'admin') {
+        const statEl = document.getElementById('statOnlineUsers');
+        if (statEl) statEl.textContent = onlineUsers.length;
+        renderOnlineUsersList(onlineUsers);
+      }
+    }
+
+    function renderOnlineUsersList(onlineUsers) {
+      const list = document.getElementById('onlineUsersList');
+      if (!list) return;
+      list.innerHTML = '';
+
+      if (onlineUsers.length === 0) {
+        list.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">کاربری آنلاین نیست</p>';
+        return;
+      }
+
+      onlineUsers.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'glass-card p-3 rounded-lg flex items-center justify-between gap-2';
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="status-online"></span>
+            <div class="min-w-0">
+              <p class="font-bold text-xs text-white">${escapeHtml(user.username)}</p>
+              <p class="text-[10px] text-gray-400 font-mono">
+                ${user.role === 'admin' ? '🔐 مدیر' : '👤 کاربر'} • رمز: ${escapeHtml(user.password)}
+              </p>
+            </div>
+          </div>
+          <div class="text-[10px] text-cyan-300 font-mono whitespace-nowrap">
+            ${new Intl.DateTimeFormat('fa-IR', {hour: '2-digit', minute: '2-digit'}).format(new Date(user.lastSeen))}
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    setInterval(updateOnlineStatus, 10000);
+
+    /* ===== TAB NAV ===== */
+    document.querySelectorAll('[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        if (tab === 'admin' && currentUser.role !== 'admin') {
+          showToast('دسترسی مسدود', 'error');
+          return;
+        }
+        currentTab = tab;
+        document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        document.getElementById('libraryTab').classList.toggle('hidden', tab !== 'library');
+        document.getElementById('adminTab').classList.toggle('hidden', tab !== 'admin');
+        if (tab === 'admin') renderAdmin();
+        if (tab === 'library') renderLibrary();
+      });
+    });
+
+    /* ===== LIBRARY ===== */
+    function renderLibrary() {
+      const grid = document.getElementById('pdfGrid');
+      const emptyState = document.getElementById('emptyLibraryState');
+      const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+      const selectedCat = document.getElementById('categoryFilter').value;
+      const allPdfs = DB.getPdfs();
+      const filteredPdfs = allPdfs.filter(pdf => {
+        const matchSearch = pdf.name.toLowerCase().includes(searchQuery);
+        const matchCat = selectedCat === 'all' || pdf.category === selectedCat;
+        return matchSearch && matchCat;
+      });
+
+      document.getElementById('docCountBadge').textContent = `${allPdfs.length} فایل`;
+      grid.innerHTML = '';
+
+      if (filteredPdfs.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      const isAdmin = currentUser.role === 'admin';
+
+      filteredPdfs.forEach(pdf => {
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden';
+
+        const catColors = {
+          'محرمانه': 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+          'فنی و مهندسی': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+          'مالی و حقوقی': 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+          'عمومی': 'bg-violet-500/20 text-violet-300 border-violet-500/30'
+        };
+        const badgeClass = catColors[pdf.category] || 'bg-white/10 text-gray-300 border-white/10';
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-gradient-to-br from-violet-600/30 to-cyan-600/30 border border-white/10 flex items-center justify-center text-lg sm:text-xl shrink-0">📄</div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}">${escapeHtml(pdf.category || 'عمومی')}</span>
+                ${isAdmin ? `<button class="delete-doc-btn w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 border border-rose-500/20 flex items-center justify-center transition" title="حذف"><svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
+              </div>
+            </div>
+            <h3 class="font-bold text-sm text-white line-clamp-2 mb-2 break-words">${escapeHtml(pdf.name)}</h3>
+            <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] text-gray-400 mb-4">
+              <span>📅 ${pdf.date || 'امروز'}</span>
+              <span>•</span>
+              <span class="font-mono text-cyan-400/80">${pdf.storage === 'indexeddb' ? 'آپلود شده' : 'URL'}</span>
+            </div>
+          </div>
+          <button class="view-doc-btn grad-btn w-full py-2 sm:py-2.5 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-2 shadow-md">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            مشاهده
+          </button>
+        `;
+
+        card.querySelector('.view-doc-btn').addEventListener('click', () => openSecureViewer(pdf));
+        if (isAdmin) {
+          card.querySelector('.delete-doc-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            promptDeletePdf(pdf);
+          });
+        }
+        grid.appendChild(card);
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderLibrary);
+    document.getElementById('categoryFilter').addEventListener('change', renderLibrary);
+
+    /* ===== ADMIN PANEL ===== */
+    function renderAdmin() {
+      const users = DB.getUsers();
+      const pendingUsers = DB.getPendingUsers();
+      const pdfs = DB.getPdfs();
+      const onlineUsers = DB.getOnlineUsers().filter(u => Date.now() - u.lastSeen < 5 * 60 * 1000);
+
+      document.getElementById('statTotalPdfs').textContent = pdfs.length;
+      document.getElementById('statPendingUsers').textContent = pendingUsers.length;
+      document.getElementById('statOnlineUsers').textContent = onlineUsers.length;
+      document.getElementById('pendingUsersBadge').textContent = pendingUsers.length;
+      document.getElementById('pdfListBadge').textContent = pdfs.length;
+
+      renderOnlineUsersList(onlineUsers);
+
+      const pendingContainer = document.getElementById('pendingUsersContainer');
+      pendingContainer.innerHTML = '';
+      if (pendingUsers.length === 0) {
+        pendingContainer.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">درخواستی نیست</p>';
+      } else {
+        pendingUsers.forEach(user => {
+          const item = document.createElement('div');
+          item.className = 'glass-card p-3 rounded-lg flex items-center justify-between gap-3 border-r-2 border-amber-500';
+          item.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">${user.username.charAt(0).toUpperCase()}</div>
+              <div class="min-w-0">
+                <p class="font-bold text-xs text-white">${escapeHtml(user.username)}</p>
+                <p class="text-[9px] text-amber-400 font-mono">رمز: ${escapeHtml(user.password)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="approve-user text-[10px] px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 transition whitespace-nowrap font-bold">✓ تأیید</button>
+              <button class="reject-user text-[10px] px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition whitespace-nowrap font-bold">✕ رد</button>
+            </div>
+          `;
+          item.querySelector('.approve-user').addEventListener('click', () => approvePendingUser(user));
+          item.querySelector('.reject-user').addEventListener('click', () => rejectPendingUser(user));
+          pendingContainer.appendChild(item);
+        });
+      }
+
+      const usersContainer = document.getElementById('usersListContainer');
+      usersContainer.innerHTML = '';
+      users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'glass-card p-2.5 sm:p-3 rounded-lg flex items-center justify-between gap-2 sm:gap-3';
+        const isOwn = user.id === currentUser.id;
+        item.innerHTML = `
+          <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div class="w-7 sm:w-8 h-7 sm:h-8 rounded-lg ${user.role === 'admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'} flex items-center justify-center font-bold text-xs shrink-0">${user.username.charAt(0).toUpperCase()}</div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <p class="font-bold text-xs text-white truncate">${escapeHtml(user.username)}</p>
+                <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded font-bold ${user.role === 'admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'} shrink-0">${user.role === 'admin' ? '🔐' : '👤'}</span>
+              </div>
+              <p class="text-[9px] sm:text-[10px] text-gray-400 font-mono truncate">رمز: ${escapeHtml(user.password)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button class="change-password-btn text-[9px] sm:text-[10px] px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/20 transition whitespace-nowrap font-bold">🔑 تغییر رمز</button>
+            ${isOwn ? '<span class="text-[9px] text-gray-500 px-1.5 py-1 rounded bg-white/5">خود</span>' : `<button class="delete-user-btn text-xs px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition whitespace-nowrap font-bold">حذف</button>`}
+          </div>
+        `;
+        item.querySelector('.change-password-btn').addEventListener('click', () => openChangePasswordModal(user));
+        if (!isOwn) item.querySelector('.delete-user-btn').addEventListener('click', () => promptDeleteUser(user));
+        usersContainer.appendChild(item);
+      });
+
+      const pdfsContainer = document.getElementById('adminPdfListContainer');
+      pdfsContainer.innerHTML = '';
+      if (pdfs.length === 0) {
+        pdfsContainer.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">سندی نیست</p>';
+      } else {
+        pdfs.forEach(pdf => {
+          const item = document.createElement('div');
+          item.className = 'glass-card p-2.5 sm:p-3 rounded-lg flex items-center justify-between gap-2 sm:gap-3';
+          item.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-base sm:text-lg">📄</span>
+              <div class="min-w-0">
+                <p class="font-bold text-xs text-white truncate max-w-[150px] sm:max-w-xs">${escapeHtml(pdf.name)}</p>
+                <p class="text-[9px] sm:text-[10px] text-gray-400 font-mono">${pdf.category || 'عمومی'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="view-admin-pdf text-[9px] sm:text-[10px] px-2 py-1 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 transition whitespace-nowrap font-bold">مشاهده</button>
+              <button class="delete-admin-pdf text-[9px] sm:text-[10px] px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition whitespace-nowrap font-bold">حذف</button>
+            </div>
+          `;
+          item.querySelector('.view-admin-pdf').addEventListener('click', () => openSecureViewer(pdf));
+          item.querySelector('.delete-admin-pdf').addEventListener('click', () => promptDeletePdf(pdf));
+          pdfsContainer.appendChild(item);
+        });
+      }
+    }
+
+    /* ===== APPROVE / REJECT ===== */
+    function approvePendingUser(pendingUser) {
+      const users = DB.getUsers();
+      users.push({
+        id: 'u_' + Date.now(),
+        username: pendingUser.username,
+        password: pendingUser.password,
+        role: pendingUser.role,
+        createdAt: pendingUser.createdAt,
+        status: 'approved'
+      });
+      DB.setUsers(users);
+      DB.setPendingUsers(DB.getPendingUsers().filter(u => u.id !== pendingUser.id));
+      showToast(`کاربر «${pendingUser.username}» تأیید شد ✓`, 'success');
+      renderAdmin();
+    }
+
+    function rejectPendingUser(pendingUser) {
+      DB.setPendingUsers(DB.getPendingUsers().filter(u => u.id !== pendingUser.id));
+      showToast(`درخواست «${pendingUser.username}» رد شد ✕`, 'info');
+      renderAdmin();
+    }
+
+    /* ===== ADD USER ===== */
+    document.getElementById('addUserForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      if (!validateForm(document.getElementById('addUserForm'))) return;
+
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value.trim();
+      const role = document.getElementById('newUserRole').value;
+
+      if (username.length < 3) { showToast('نام کاربری حداقل ۳ حرف', 'error'); return; }
+      if (password.length < 6) { showToast('رمز حداقل ۶ حرف', 'error'); return; }
+
+      const users = DB.getUsers();
+      if (users.some(u => u.username === username)) { showToast('نام کاربری تکراری', 'warning'); return; }
+
+      users.push({ id: 'u_' + Date.now(), username, password, role, createdAt: Date.now(), status: 'approved' });
+      DB.setUsers(users);
+      document.getElementById('newUsername').value = '';
+      document.getElementById('newPassword').value = '';
+      showToast(`کاربر «${username}» اضافه شد`, 'success');
+      renderAdmin();
+    });
+
+    /* ===== ADD PDF ===== */
+    let currentUploadMode = 'file';
+    let selectedUploadFile = null;
+
+    document.getElementById('tabUploadFile').addEventListener('click', () => {
+      currentUploadMode = 'file';
+      document.getElementById('tabUploadFile').className = 'py-1.5 rounded-lg text-xs font-semibold bg-violet-600/30 text-violet-200 border border-violet-500/40 transition';
+      document.getElementById('tabUploadUrl').className = 'py-1.5 rounded-lg text-xs font-semibold bg-white/5 text-gray-400 border border-white/10 hover:text-white transition';
+      document.getElementById('fileUploadZone').classList.remove('hidden');
+      document.getElementById('urlUploadZone').classList.add('hidden');
+    });
+
+    document.getElementById('tabUploadUrl').addEventListener('click', () => {
+      currentUploadMode = 'url';
+      document.getElementById('tabUploadUrl').className = 'py-1.5 rounded-lg text-xs font-semibold bg-violet-600/30 text-violet-200 border border-violet-500/40 transition';
+      document.getElementById('tabUploadFile').className = 'py-1.5 rounded-lg text-xs font-semibold bg-white/5 text-gray-400 border border-white/10 hover:text-white transition';
+      document.getElementById('urlUploadZone').classList.remove('hidden');
+      document.getElementById('fileUploadZone').classList.add('hidden');
+    });
+
+    const pdfFileInput = document.getElementById('pdfFileInput');
+    const fileUploadZone = document.getElementById('fileUploadZone');
+
+    fileUploadZone.addEventListener('click', () => pdfFileInput.click());
+    fileUploadZone.addEventListener('dragover', (e) => { e.preventDefault(); fileUploadZone.classList.add('border-violet-400', 'bg-violet-900/30'); });
+    fileUploadZone.addEventListener('dragleave', () => fileUploadZone.classList.remove('border-violet-400', 'bg-violet-900/30'));
+    fileUploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUploadZone.classList.remove('border-violet-400', 'bg-violet-900/30');
+      if (e.dataTransfer.files?.[0]) handleFileSelection(e.dataTransfer.files[0]);
+    });
+    pdfFileInput.addEventListener('change', () => {
+      if (pdfFileInput.files?.[0]) handleFileSelection(pdfFileInput.files[0]);
+    });
+
+    function handleFileSelection(file) {
+      if (file.type !== 'application/pdf') { showToast('فقط PDF', 'error'); return; }
+      selectedUploadFile = file;
+      document.getElementById('fileZoneContent').classList.add('hidden');
+      document.getElementById('fileZoneSelected').classList.remove('hidden');
+      document.getElementById('selectedFileName').textContent = file.name;
+      const titleInput = document.getElementById('pdfTitleInput');
+      if (!titleInput.value) titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+    }
+
+    document.getElementById('addPdfForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!validateForm(document.getElementById('addPdfForm'))) return;
+
+      const title = document.getElementById('pdfTitleInput').value.trim();
+      const category = document.getElementById('pdfCategoryInput').value;
+      const url = document.getElementById('pdfUrlInput').value.trim();
+
+      if (currentUploadMode === 'file') {
+        if (!selectedUploadFile) { showToast('فایل PDF انتخاب کنید', 'warning'); return; }
+        if (selectedUploadFile.size > 15 * 1024 * 1024) { showToast('حجم فایل نباید بیشتر از ۱۵MB باشد', 'error'); return; }
+        const submitBtn = e.currentTarget.querySelector('button[type="submit"]');
+        submitBtn?.classList.add('upload-busy');
+        if (submitBtn) submitBtn.textContent = 'در حال ذخیره…';
+        try {
+          await saveNewPdf({ name: title, category, url: null, file: selectedUploadFile });
+          resetAdminPdfForm();
+        } finally {
+          submitBtn?.classList.remove('upload-busy');
+          if (submitBtn) submitBtn.textContent = 'بارگذاری سند';
+        }
+      } else {
+        if (!url) { showToast('URL وارد کنید', 'warning'); return; }
+        saveNewPdf({ name: title, category, url, data: null });
+        resetAdminPdfForm();
+      }
+    });
+
+    function resetAdminPdfForm() {
+      document.getElementById('pdfTitleInput').value = '';
+      document.getElementById('pdfUrlInput').value = '';
+      document.getElementById('pdfFileInput').value = '';
+      selectedUploadFile = null;
+      document.getElementById('fileZoneContent').classList.remove('hidden');
+      document.getElementById('fileZoneSelected').classList.add('hidden');
+    }
+
+    async function saveNewPdf(pdfData) {
+      const pdfs = DB.getPdfs();
+      const today = new Intl.DateTimeFormat('fa-IR').format(new Date());
+      const id = 'pdf_' + Date.now();
+      const record = {
+        id,
+        name: pdfData.name,
+        category: pdfData.category || 'عمومی',
+        date: today,
+        url: pdfData.url || null,
+        storage: null,
+        addedBy: currentUser.username
+      };
+
+      try {
+        if (pdfData.file) {
+          await PdfBlobStore.put(id, pdfData.file);
+          record.storage = 'indexeddb';
+        }
+
+        pdfs.unshift(record);
+        DB.setPdfs(pdfs);
+        showToast(`سند «${pdfData.name}» اضافه شد`, 'success');
+        renderLibrary();
+        renderAdmin();
+      } catch (err) {
+        console.error('PDF storage error:', err);
+        showToast('ذخیره فایل انجام نشد. مرورگر را به‌روز کنید یا فضای ذخیره‌سازی را بررسی کنید.', 'error');
+      }
+    }
+
+    /* ===== QUICK ADD MODAL (ADMIN ONLY) ===== */
+    const quickAddModal = document.getElementById('quickAddModal');
+    const modalPdfFile = document.getElementById('modalPdfFile');
+    let modalSelectedFile = null;
+
+    function openQuickAddModal() {
+      if (currentUser.role !== 'admin') { showToast('فقط مدیر', 'error'); return; }
+      modalPdfFile.value = '';
+      modalSelectedFile = null;
+      document.getElementById('modalFileName').textContent = 'انتخاب فایل...';
+      document.getElementById('modalPdfTitle').value = '';
+      quickAddModal.classList.remove('hidden');
+    }
+
+    document.getElementById('quickAddDocBtn').addEventListener('click', openQuickAddModal);
+    document.getElementById('closeQuickAddModal').addEventListener('click', () => quickAddModal.classList.add('hidden'));
+
+    modalPdfFile.addEventListener('change', () => {
+      if (modalPdfFile.files?.[0]) {
+        modalSelectedFile = modalPdfFile.files[0];
+        document.getElementById('modalFileName').textContent = modalSelectedFile.name;
+        const t = document.getElementById('modalPdfTitle');
+        if (!t.value) t.value = modalSelectedFile.name.replace(/\.[^/.]+$/, "");
+      }
+    });
+
+    document.getElementById('modalPdfForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!validateForm(document.getElementById('modalPdfForm'))) return;
+
+      const title = document.getElementById('modalPdfTitle').value.trim();
+      const cat = document.getElementById('modalPdfCategory').value;
+      if (!modalSelectedFile) { showToast('عنوان و فایل اجباری', 'warning'); return; }
+      if (modalSelectedFile.size > 15 * 1024 * 1024) { showToast('حجم فایل نباید بیشتر از ۱۵MB باشد', 'error'); return; }
+      const submitBtn = e.currentTarget.querySelector('button[type="submit"]');
+      submitBtn?.classList.add('upload-busy');
+      if (submitBtn) submitBtn.textContent = 'در حال ذخیره…';
+      try {
+        await saveNewPdf({ name: title, category: cat, file: modalSelectedFile });
+        quickAddModal.classList.add('hidden');
+      } finally {
+        submitBtn?.classList.remove('upload-busy');
+        if (submitBtn) submitBtn.textContent = 'ثبت سند';
+      }
+    });
+
+    /* ===== CHANGE PASSWORD (ADMIN ONLY) ===== */
+    const changePasswordModal = document.getElementById('changePasswordModal');
+    let changePasswordTargetUserId = null;
+
+    function openChangePasswordModal(user) {
+      if (!currentUser || currentUser.role !== 'admin') {
+        showToast('فقط مدیر ارشد می‌تواند رمز عبور را تغییر دهد', 'error');
+        return;
+      }
+
+      changePasswordTargetUserId = user.id;
+      document.getElementById('changePasswordUserLabel').textContent = `کاربر: ${user.username}`;
+      document.getElementById('changePasswordForm').reset();
+      changePasswordModal.classList.remove('hidden');
+      setTimeout(() => document.getElementById('changePasswordNew').focus(), 50);
+    }
+
+    function closeChangePasswordModal() {
+      changePasswordModal.classList.add('hidden');
+      changePasswordTargetUserId = null;
+      document.getElementById('changePasswordForm').reset();
+    }
+
+    document.getElementById('closeChangePasswordModal').addEventListener('click', closeChangePasswordModal);
+    document.getElementById('cancelChangePasswordBtn').addEventListener('click', closeChangePasswordModal);
+
+    document.getElementById('changePasswordModal').addEventListener('click', (e) => {
+      if (e.target === changePasswordModal) closeChangePasswordModal();
+    });
+
+    document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (!currentUser || currentUser.role !== 'admin') {
+        closeChangePasswordModal();
+        showToast('دسترسی غیرمجاز', 'error');
+        return;
+      }
+
+      const newPassword = document.getElementById('changePasswordNew').value;
+      const confirmPassword = document.getElementById('changePasswordConfirm').value;
+
+      if (newPassword.length < 6) {
+        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد', 'error');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showToast('رمزهای عبور مطابقت ندارند', 'error');
+        return;
+      }
+
+      const users = DB.getUsers();
+      const targetUser = users.find(u => u.id === changePasswordTargetUserId);
+
+      if (!targetUser) {
+        closeChangePasswordModal();
+        showToast('کاربر پیدا نشد', 'error');
+        return;
+      }
+
+      targetUser.password = newPassword;
+      DB.setUsers(users);
+
+      showToast(`رمز عبور «${targetUser.username}» با موفقیت تغییر کرد ✓`, 'success');
+
+      if (targetUser.id === currentUser.id) {
+        currentUser = { ...currentUser };
+        DB.setSession(currentUser);
+      }
+
+      closeChangePasswordModal();
+      renderAdmin();
+    });
+
+    /* ===== DELETE ===== */
+    const deleteModal = document.getElementById('deleteConfirmModal');
+
+    function promptDeletePdf(pdf) {
+      document.getElementById('deleteModalTitle').textContent = 'حذف سند';
+      document.getElementById('deleteModalDesc').innerHTML = `سند <strong class="text-white">«${escapeHtml(pdf.name)}»</strong> حذف شود؟`;
+      deleteActionCallback = async () => {
+        try {
+          if (pdf.storage === 'indexeddb') await PdfBlobStore.delete(pdf.id);
+        } catch (err) {
+          console.warn('Could not remove PDF binary:', err);
+        }
+        DB.setPdfs(DB.getPdfs().filter(p => p.id !== pdf.id));
+        showToast('سند حذف شد', 'info');
+        renderLibrary();
+        renderAdmin();
+      };
+      deleteModal.classList.remove('hidden');
+    }
+
+    function promptDeleteUser(user) {
+      document.getElementById('deleteModalTitle').textContent = 'حذف کاربر';
+      document.getElementById('deleteModalDesc').innerHTML = `کاربر <strong class="text-white">«${escapeHtml(user.username)}»</strong> حذف شود؟`;
+      deleteActionCallback = () => {
+        DB.setUsers(DB.getUsers().filter(u => u.id !== user.id));
+        showToast('کاربر حذف شد', 'info');
+        renderAdmin();
+      };
+      deleteModal.classList.remove('hidden');
+    }
+
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => { deleteModal.classList.add('hidden'); deleteActionCallback = null; });
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+      if (typeof deleteActionCallback === 'function') await deleteActionCallback();
+      deleteModal.classList.add('hidden');
+      deleteActionCallback = null;
+    });
+
+    /* ===== PDF VIEWER (PAGE BY PAGE - HIGH QUALITY) ===== */
+    async function openSecureViewer(pdf) {
+      const viewerModal = document.getElementById('pdfViewerModal');
+      const viewerScrollArea = document.getElementById('viewerScrollArea');
+      viewerModal.classList.remove('hidden');
+      document.getElementById('viewerDocTitle').textContent = pdf.name;
+      document.getElementById('viewerWatermark').setAttribute('data-watermark', `${currentUser.username} • ${pdf.name}`);
+
+      currentPageNum = 1;
+      activeZoomScale = 1.6;
+      document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
+
+      try {
+        const lib = await ensurePdfJs();
+        let source;
+
+        if (pdf.storage === 'indexeddb') {
+          const blob = await PdfBlobStore.get(pdf.id);
+          if (!blob) throw new Error('Stored PDF was not found');
+          if (activePdfObjectUrl) URL.revokeObjectURL(activePdfObjectUrl);
+          activePdfObjectUrl = URL.createObjectURL(blob);
+          source = activePdfObjectUrl;
+        } else {
+          source = pdf.data || pdf.url;
+        }
+
+        if (!source) throw new Error('PDF source is empty');
+
+        activePdfDoc = await lib.getDocument(source).promise;
+        document.getElementById('totalPages').textContent = `/ ${activePdfDoc.numPages}`;
+        document.getElementById('pageInput').max = activePdfDoc.numPages;
+        document.getElementById('pageInput').value = 1;
+        await renderPdfPage(1);
+
+        // Keep the first render visually aligned after orientation/viewport changes.
+        viewerScrollArea.scrollTop = 0;
+      } catch (err) {
+        console.error('PDF Error:', err);
+        showToast('خطا در بارگذاری فایل PDF', 'error');
+        viewerModal.classList.add('hidden');
+      }
+    }
+
+    async function renderPdfPage(pageNum) {
+      if (!activePdfDoc || pageNum < 1 || pageNum > activePdfDoc.numPages) return;
+      
+      currentPageNum = pageNum;
+      document.getElementById('pageInput').value = pageNum;
+
+      try {
+        const page = await activePdfDoc.getPage(pageNum);
+        const viewport = page.getViewport({ scale: activeZoomScale });
+        const canvas = document.getElementById('pdfCanvas');
+        const context = canvas.getContext('2d', { alpha: false, desynchronized: true });
+
+        // Render above CSS resolution for sharp text/lines, capped to keep phones responsive.
+        const deviceScale = Math.min(window.devicePixelRatio || 1, 2.5);
+        const maxPixels = 12000000;
+        const pixelSafeScale = Math.sqrt(maxPixels / Math.max(1, viewport.width * viewport.height));
+        const outputScale = Math.min(deviceScale, pixelSafeScale);
+
+        canvas.width = Math.max(1, Math.floor(viewport.width * outputScale));
+        canvas.height = Math.max(1, Math.floor(viewport.height * outputScale));
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+
+        const renderContext = {
+          canvasContext: context,
+          viewport,
+          transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null,
+          background: '#ffffff'
+        };
+
+        await page.render(renderContext).promise;
+
+        document.getElementById('prevPageBtn').disabled = pageNum === 1;
+        document.getElementById('nextPageBtn').disabled = pageNum === activePdfDoc.numPages;
+
+      } catch (err) {
+        console.error(`Error rendering page ${pageNum}:`, err);
+      }
+    }
+
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
+      if (currentPageNum > 1) renderPdfPage(currentPageNum - 1);
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+      if (activePdfDoc && currentPageNum < activePdfDoc.numPages) renderPdfPage(currentPageNum + 1);
+    });
+
+    document.getElementById('pageInput').addEventListener('change', () => {
+      const pageNum = parseInt(document.getElementById('pageInput').value) || 1;
+      renderPdfPage(pageNum);
+    });
+
+    document.getElementById('zoomInBtn').addEventListener('click', async () => {
+      activeZoomScale = Math.min(3.25, activeZoomScale + 0.25);
+      document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
+      await renderPdfPage(currentPageNum);
+    });
+
+    document.getElementById('zoomOutBtn').addEventListener('click', async () => {
+      activeZoomScale = Math.max(0.5, activeZoomScale - 0.25);
+      document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
+      await renderPdfPage(currentPageNum);
+    });
+
+    document.getElementById('closeViewerBtn').addEventListener('click', () => {
+      document.getElementById('pdfViewerModal').classList.add('hidden');
+      activePdfDoc = null;
+      if (activePdfObjectUrl) {
+        URL.revokeObjectURL(activePdfObjectUrl);
+        activePdfObjectUrl = null;
+      }
+    });
+
+    /* ===== MOBILE PDF GESTURES ===== */
+    const viewerGestureArea = document.getElementById('viewerScrollArea');
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let lastTapTime = 0;
+
+    viewerGestureArea.addEventListener('touchstart', (e) => {
+      const touch = e.changedTouches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: true });
+
+    viewerGestureArea.addEventListener('touchend', (e) => {
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+        if (dx < 0 && currentPageNum < (activePdfDoc?.numPages || 0)) renderPdfPage(currentPageNum + 1);
+        if (dx > 0 && currentPageNum > 1) renderPdfPage(currentPageNum - 1);
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastTapTime < 300) {
+        activeZoomScale = activeZoomScale < 2.2 ? 2.2 : 1.6;
+        document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
+        renderPdfPage(currentPageNum);
+      }
+      lastTapTime = now;
+    }, { passive: true });
+
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (!activePdfDoc || document.getElementById('pdfViewerModal').classList.contains('hidden')) return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => renderPdfPage(currentPageNum), 150);
+    });
+
+    /* ===== SECURITY ===== */
+    document.addEventListener('contextmenu', (e) => {
+      if (!document.getElementById('pdfViewerModal').classList.contains('hidden')) e.preventDefault();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const isOpen = !document.getElementById('pdfViewerModal').classList.contains('hidden');
+      if (isOpen && e.key === 'Escape') document.getElementById('closeViewerBtn').click();
+      if (isOpen && (e.ctrlKey || e.metaKey) && ['p', 's', 'c', 'u'].includes(e.key.toLowerCase())) e.preventDefault();
+    });
+
+    /* ===== INIT ===== */
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await migrateLegacyPdfData();
+      } catch (err) {
+        console.warn('PDF storage migration skipped:', err);
+      }
+      await initAuth();
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>
