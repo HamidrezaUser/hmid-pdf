@@ -8,11 +8,38 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>آرشیو محرمانه اسناد | مدیریت اختصاصی</title>
+  <title>PDF Hot 🔥</title>
   <script src="https://cdn.tailwindcss.com" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/mourgen" rel="stylesheet">
+  <style>
+    .brand-hot {
+      font-family: 'MOURGEN', Georgia, serif !important;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #fde047, #fb923c 45%, #f43f5e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.5;
+      padding: 0 0.1em;
+      filter: drop-shadow(0 4px 14px rgba(251, 146, 60, 0.35));
+    }
+
+    .fire-emoji {
+      display: inline-block;
+      transform-origin: 50% 90%;
+      animation: fireFlicker 1.4s ease-in-out infinite;
+    }
+
+    @keyframes fireFlicker {
+      0%, 100% { transform: scale(1) rotate(-4deg); filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.6)); }
+      25%      { transform: scale(1.12) rotate(3deg); filter: drop-shadow(0 0 12px rgba(251, 146, 60, 0.9)); }
+      50%      { transform: scale(0.96) rotate(-2deg); filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.7)); }
+      75%      { transform: scale(1.08) rotate(4deg); filter: drop-shadow(0 0 14px rgba(251, 146, 60, 0.9)); }
+    }
+  </style>
 
   <style>
     :root {
@@ -408,6 +435,30 @@
 
 <body class="pdf-protected relative flex flex-col min-h-screen">
 
+  <!-- آیکون آتش (SVG اختصاصی؛ روی همه دستگاه‌ها یکسان دیده می‌شود) -->
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <linearGradient id="fgOuter" x1="0.2" y1="0" x2="0.6" y2="1">
+        <stop offset="0" stop-color="#ffb02e"/>
+        <stop offset="0.45" stop-color="#ff6a1a"/>
+        <stop offset="1" stop-color="#e8232a"/>
+      </linearGradient>
+      <linearGradient id="fgMid" x1="0.5" y1="0" x2="0.5" y2="1">
+        <stop offset="0" stop-color="#ffd23f"/>
+        <stop offset="1" stop-color="#ff8a14"/>
+      </linearGradient>
+      <linearGradient id="fgCore" x1="0.5" y1="0" x2="0.5" y2="1">
+        <stop offset="0" stop-color="#fffbe0"/>
+        <stop offset="1" stop-color="#ffe566"/>
+      </linearGradient>
+      <symbol id="flame-icon" viewBox="0 0 64 64">
+        <path fill="url(#fgOuter)" d="M33 3C34 12 45 18 49 30C53 42 46 60 32 60C18 60 10 48 14 35C16 29 20 26 22 20C24 25 26 27 28 27C30 20 29 10 33 3Z"/>
+        <path fill="url(#fgMid)" d="M32.5 22C33 29 40 33 42 41C44 50 39 58 32 58C25 58 20 51 22 44C23 40 26 38 27 34C29 37 31 38 32 38C33 33 31 27 32.5 22Z"/>
+        <path fill="url(#fgCore)" d="M32 41C33 45 37 47 37.5 51C38 55 35.5 58 32 58C28.5 58 26.5 55 27 52C27.5 49 30 47.5 30.5 45C31 44 31.5 43 32 41Z"/>
+      </symbol>
+    </defs>
+  </svg>
+
   <div class="blob" style="width: 550px; height: 550px; background: #7c3aed; top: -150px; right: -120px;"></div>
   <div class="blob" style="width: 600px; height: 600px; background: #06b6d4; bottom: -180px; left: -160px; animation-delay: -5s;"></div>
   <div class="blob" style="width: 400px; height: 400px; background: #ec4899; top: 40%; left: 30%; animation-delay: -9s;"></div>
@@ -435,8 +486,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
         </div>
-        <h1 class="text-3xl font-extrabold grad-text tracking-tight">آرشیو محرمانه</h1>
-        <p class="text-xs sm:text-sm text-gray-400 mt-2 leading-relaxed">سامانه حفاظت‌شده مدیریت اسناد دیجیتال</p>
+        <h1 dir="ltr" class="flex items-center justify-center gap-2">
+          <span class="brand-hot text-4xl sm:text-5xl">PDF Hot</span>
+          <svg class="fire-emoji w-10 h-10 sm:w-12 sm:h-12" viewBox="0 0 64 64" aria-hidden="true"><use href="#flame-icon"/></svg>
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-300 mt-3 leading-relaxed">PDFهای داغ و تازه از تنور درآمده، فقط برای آدم‌های خوش‌سلیقه! 😄</p>
       </div>
 
       <form id="loginFormElement" class="space-y-5">
@@ -540,7 +594,10 @@
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="font-black text-base sm:text-lg text-white">آرشیو محرمانه</h2>
+              <h2 dir="ltr" class="flex items-center gap-1.5">
+                <span class="brand-hot text-xl sm:text-2xl">PDF Hot</span>
+                <svg class="fire-emoji w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 64 64" aria-hidden="true"><use href="#flame-icon"/></svg>
+              </h2>
               <span id="roleBadge" class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 shrink-0">نقش</span>
             </div>
             <p id="currentUserDisplay" class="text-[10px] sm:text-xs text-gray-400 font-mono"></p>
