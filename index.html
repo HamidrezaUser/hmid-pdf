@@ -482,7 +482,7 @@
 
       <form id="registerFormElement" class="space-y-5">
         <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">نام کاربری (حداقل ۳ حرف)</label>
+          <label class="block text-xs font-semibold text-gray-300 mb-2 mr-1">نام کاربری (انگلیسی، حداقل ۳ حرف)</label>
           <div class="input-wrapper">
             <span class="field-icon">👤</span>
             <input id="regUsername" type="text" required dir="ltr" minlength="3" class="input-field w-full px-4 py-3 rounded-xl text-left text-sm" placeholder="نام کاربری" />
@@ -894,6 +894,8 @@
     Made With 💛 By <a href="https://t.me/infected_humen" target="_blank" rel="noopener noreferrer">INFECTED</a>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- ===== JAVASCRIPT ===== -->
   <script>
     /* ===== LAZY PDF.JS LOADER ===== */
@@ -923,166 +925,73 @@
       return pdfJsLoadPromise;
     }
 
-    /* ===== STORAGE ===== */
-    const STORAGE_KEYS = {
-      USERS: 'arsh_users_v5',
-      PENDING_USERS: 'arsh_pending_v5',
-      PDFS: 'arsh_pdfs_v5',
-      SESSION: 'arsh_session_v5',
-      ONLINE_USERS: 'arsh_online_v5'
-    };
+    /* ===== SUPABASE ===== */
+    const SUPABASE_URL = 'https://xkoqaxjxldvauukwlkfa.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E87hJOtPfvOuZAT6N4rM2w_w6BqzilE';
+    // نام کاربری‌ها به‌صورت ایمیل مجازی در Supabase Auth ذخیره می‌شوند
+    const EMAIL_DOMAIN = 'hmid-pdf.vercel.app';
+    const USERNAME_RE = /^[a-zA-Z0-9_.-]{3,30}$/;
 
-    /* ===== DB ===== */
-    const DB = {
-      getUsers: () => {
-        let raw = localStorage.getItem(STORAGE_KEYS.USERS);
-        let users = raw ? JSON.parse(raw) : [];
-        const hasAdmin = users.find(u => u.id === 'u_master_admin');
-        if (!hasAdmin) {
-          users.unshift({
-            id: 'u_master_admin',
-            username: 'admin_master_system',
-            password: 'SecureAdminPass2024!',
-            role: 'admin',
-            createdAt: Date.now(),
-            status: 'approved'
-          });
-          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-        }
-        return users;
-      },
-      setUsers: (users) => localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users)),
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // کلاینت جدا برای ساخت کاربر توسط مدیر (تا نشست خود مدیر عوض نشود)
+    const sbCreator = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'arsh-creator' }
+    });
 
-      getPendingUsers: () => {
-        const raw = localStorage.getItem(STORAGE_KEYS.PENDING_USERS);
-        return raw ? JSON.parse(raw) : [];
-      },
-      setPendingUsers: (users) => localStorage.setItem(STORAGE_KEYS.PENDING_USERS, JSON.stringify(users)),
+    const toEmail = (username) => `${username.trim().toLowerCase()}@${EMAIL_DOMAIN}`;
 
-      getPdfs: () => {
-        const raw = localStorage.getItem(STORAGE_KEYS.PDFS);
-        return raw ? JSON.parse(raw) : [];
-      },
-      setPdfs: (pdfs) => localStorage.setItem(STORAGE_KEYS.PDFS, JSON.stringify(pdfs)),
+    let pdfCache = [];
+    let profileCache = [];
+    let onlineList = [];
+    let presenceChannel = null;
 
-      getSession: () => JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || 'null'),
-      setSession: (session) => localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session)),
-      clearSession: () => localStorage.removeItem(STORAGE_KEYS.SESSION),
-
-      getOnlineUsers: () => {
-        const raw = localStorage.getItem(STORAGE_KEYS.ONLINE_USERS);
-        return raw ? JSON.parse(raw) : [];
-      },
-      setOnlineUsers: (users) => localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(users))
-    };
-
-    /* ===== PDF BINARY STORE (IndexedDB) ===== */
-    const PDF_DB_NAME = 'arsh_pdf_store_v1';
-    const PDF_DB_VERSION = 1;
-    const PDF_STORE_NAME = 'files';
-    let pdfMetaCache = null;
-
-    const PdfBlobStore = {
-      open() {
-        return new Promise((resolve, reject) => {
-          if (!('indexedDB' in window)) {
-            reject(new Error('IndexedDB is not supported'));
-            return;
-          }
-          const request = indexedDB.open(PDF_DB_NAME, PDF_DB_VERSION);
-          request.onupgradeneeded = () => {
-            const db = request.result;
-            if (!db.objectStoreNames.contains(PDF_STORE_NAME)) {
-              db.createObjectStore(PDF_STORE_NAME);
-            }
-          };
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => reject(request.error || new Error('IndexedDB open failed'));
-        });
-      },
-
-      async put(key, blob) {
-        const db = await this.open();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
-          tx.objectStore(PDF_STORE_NAME).put(blob, key);
-          tx.oncomplete = () => { db.close(); resolve(); };
-          tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB write failed')); };
-          tx.onabort = () => { db.close(); reject(tx.error || new Error('IndexedDB write aborted')); };
-        });
-      },
-
-      async get(key) {
-        const db = await this.open();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(PDF_STORE_NAME, 'readonly');
-          const request = tx.objectStore(PDF_STORE_NAME).get(key);
-          request.onsuccess = () => resolve(request.result || null);
-          request.onerror = () => reject(request.error || new Error('IndexedDB read failed'));
-          tx.oncomplete = () => db.close();
-          tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB read failed')); };
-        });
-      },
-
-      async delete(key) {
-        const db = await this.open();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
-          tx.objectStore(PDF_STORE_NAME).delete(key);
-          tx.oncomplete = () => { db.close(); resolve(); };
-          tx.onerror = () => { db.close(); reject(tx.error || new Error('IndexedDB delete failed')); };
-        });
-      }
-    };
-
-    function getPdfMeta() {
-      if (!pdfMetaCache) {
-        const raw = localStorage.getItem(STORAGE_KEYS.PDFS);
-        pdfMetaCache = raw ? JSON.parse(raw) : [];
-      }
-      return pdfMetaCache;
+    function dbError(err, message) {
+      console.error(err);
+      showToast(message || 'خطا در ارتباط با سرور', 'error');
     }
 
-    function setPdfMeta(pdfs) {
-      pdfMetaCache = pdfs;
-      localStorage.setItem(STORAGE_KEYS.PDFS, JSON.stringify(pdfs));
+    function fmtDate(iso) {
+      try { return iso ? new Intl.DateTimeFormat('fa-IR').format(new Date(iso)) : ''; } catch { return ''; }
     }
 
-    // Replace repeated JSON parsing for the PDF catalog with the in-memory metadata cache.
-    DB.getPdfs = () => getPdfMeta();
-    DB.setPdfs = (pdfs) => setPdfMeta(pdfs);
+    function setBusy(btn, busy, label) {
+      if (!btn) return;
+      btn.classList.toggle('upload-busy', busy);
+      if (label) btn.textContent = label;
+    }
 
-    async function migrateLegacyPdfData() {
-      const pdfs = getPdfMeta();
-      let changed = false;
+    async function refreshPdfs() {
+      const { data, error } = await sb.from('pdfs').select('*').order('created_at', { ascending: false });
+      if (error) { dbError(error, 'خطا در دریافت اسناد'); return; }
+      pdfCache = data || [];
+    }
 
-      for (const pdf of pdfs) {
-        if (pdf && pdf.data && !pdf.storage) {
-          try {
-            const response = await fetch(pdf.data);
-            const blob = await response.blob();
-            await PdfBlobStore.put(pdf.id, blob);
-            delete pdf.data;
-            pdf.storage = 'indexeddb';
-            changed = true;
-          } catch (err) {
-            console.warn('Legacy PDF migration failed:', pdf.id, err);
-          }
-        }
-      }
+    async function refreshProfiles() {
+      if (!currentUser || currentUser.role !== 'admin') return;
+      const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: true });
+      if (error) { dbError(error, 'خطا در دریافت کاربران'); return; }
+      profileCache = data || [];
+    }
 
-      if (changed) setPdfMeta(pdfs);
+    async function refreshLibrary() {
+      await refreshPdfs();
+      renderLibrary();
+    }
+
+    async function refreshAdminData() {
+      await Promise.all([refreshProfiles(), refreshPdfs()]);
+      renderAdmin();
     }
 
     /* ===== STATE ===== */
-    let currentUser = DB.getSession();
+    let currentUser = null;
     let currentTab = 'library';
     let deleteActionCallback = null;
 
     // PDF Viewer State
     let activePdfDoc = null;
     let currentPageNum = 1;
-    let activeZoomScale = 1.75; // نمایش با کیفیت بالاتر
+    let activeZoomScale = 1.75;
 
     /* ===== TOAST ===== */
     function showToast(message, type = 'info') {
@@ -1130,12 +1039,29 @@
     }
 
     /* ===== AUTH ===== */
-    function initAuth() {
-      if (currentUser && currentUser.id) {
-        renderApp();
-        updateOnlineStatus();
+    async function loadProfile(userId) {
+      const { data, error } = await sb.from('profiles').select('id,username,role,status').eq('id', userId).maybeSingle();
+      if (error) { console.error(error); return null; }
+      return data;
+    }
+
+    async function enterApp(profile) {
+      currentUser = { id: profile.id, username: profile.username, role: profile.role };
+      await Promise.all([refreshPdfs(), refreshProfiles()]);
+      renderApp();
+      startPresence();
+    }
+
+    async function initAuth() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { renderLogin(); return; }
+      const profile = await loadProfile(session.user.id);
+      if (profile && profile.status === 'approved') {
+        await enterApp(profile);
       } else {
+        await sb.auth.signOut();
         renderLogin();
+        if (profile) showToast('حساب شما هنوز تأیید نشده است ⏳', 'warning');
       }
     }
 
@@ -1153,15 +1079,18 @@
       document.getElementById('roleBadge').textContent = roleText;
 
       const isAdmin = currentUser.role === 'admin';
-      
       document.getElementById('adminNavBtn').classList.toggle('hidden', !isAdmin);
       document.getElementById('adminNavBtnMobile').classList.toggle('hidden', !isAdmin);
       document.getElementById('quickAddDocBtn').style.display = isAdmin ? 'flex' : 'none';
 
+      // همیشه با تب کتابخانه شروع کن
+      currentTab = 'library';
+      document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === 'library'));
+      document.getElementById('libraryTab').classList.remove('hidden');
+      document.getElementById('adminTab').classList.add('hidden');
+
       renderLibrary();
-      if (isAdmin) {
-        renderAdmin();
-      }
+      if (isAdmin) renderAdmin();
     }
 
     /* ===== LOGIN / REGISTER TABS ===== */
@@ -1183,47 +1112,53 @@
     document.getElementById('switchToLogin').addEventListener('click', () => document.getElementById('loginTabBtn').click());
 
     /* ===== LOGIN ===== */
-    document.getElementById('loginFormElement').addEventListener('submit', (e) => {
+    document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      if (!validateForm(document.getElementById('loginFormElement'))) return;
+      const form = e.currentTarget;
+      if (!validateForm(form)) return;
 
       const username = document.getElementById('loginUsername').value.trim();
       const password = document.getElementById('loginPassword').value;
+      const btn = form.querySelector('button[type="submit"]');
 
-      const users = DB.getUsers();
-      const foundUser = users.find(u => u.username === username && u.password === password);
+      setBusy(btn, true, 'در حال ورود…');
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ email: toEmail(username), password });
+        if (error) { showToast('نام کاربری یا رمز عبور اشتباه است', 'error'); return; }
 
-      if (foundUser) {
-        const role = (foundUser.id === 'u_master_admin') ? 'admin' : foundUser.role;
-        currentUser = { id: foundUser.id, username: foundUser.username, role: role };
-        DB.setSession(currentUser);
-        showToast(`خوش آمدید ${currentUser.username}!`, 'success');
-        document.getElementById('loginFormElement').reset();
-        renderApp();
-        updateOnlineStatus();
-      } else {
-        const pendingUsers = DB.getPendingUsers();
-        const pendingUser = pendingUsers.find(u => u.username === username && u.password === password);
-        if (pendingUser) {
-          showToast('حساب شما هنوز توسط مدیر تأیید نشده است ⏳', 'warning');
-        } else {
-          showToast('نام کاربری یا رمز عبور اشتباه است', 'error');
+        const profile = await loadProfile(data.user.id);
+        if (!profile) {
+          await sb.auth.signOut();
+          showToast('پروفایل کاربر پیدا نشد', 'error');
+          return;
         }
+        if (profile.status !== 'approved') {
+          await sb.auth.signOut();
+          showToast('حساب شما هنوز توسط مدیر تأیید نشده است ⏳', 'warning');
+          return;
+        }
+
+        form.reset();
+        await enterApp(profile);
+        showToast(`خوش آمدید ${profile.username}!`, 'success');
+      } catch (err) {
+        dbError(err, 'ورود انجام نشد');
+      } finally {
+        setBusy(btn, false, 'ورود به سامانه');
       }
     });
 
     /* ===== REGISTER ===== */
-    document.getElementById('registerFormElement').addEventListener('submit', (e) => {
+    document.getElementById('registerFormElement').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      if (!validateForm(document.getElementById('registerFormElement'))) return;
+      const form = e.currentTarget;
+      if (!validateForm(form)) return;
 
       const username = document.getElementById('regUsername').value.trim();
       const password = document.getElementById('regPassword').value;
       const confirm = document.getElementById('regPasswordConfirm').value;
 
-      if (username.length < 3) { showToast('نام کاربری حداقل ۳ حرف', 'error'); return; }
+      if (!USERNAME_RE.test(username)) { showToast('نام کاربری: ۳ تا ۳۰ حرف انگلیسی، عدد یا _ . -', 'error'); return; }
       if (password.length < 6) { showToast('رمز حداقل ۶ حرف', 'error'); return; }
       if (!/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
         showToast('رمز باید حروف + اعداد داشته باشد', 'error');
@@ -1231,92 +1166,108 @@
       }
       if (password !== confirm) { showToast('رمزها مطابقت ندارند', 'error'); return; }
 
-      const users = DB.getUsers();
-      const pending = DB.getPendingUsers();
+      const btn = form.querySelector('button[type="submit"]');
+      setBusy(btn, true, 'در حال ثبت‌نام…');
+      try {
+        const { data, error } = await sb.auth.signUp({
+          email: toEmail(username),
+          password,
+          options: { data: { username: username.toLowerCase() } }
+        });
 
-      if (users.some(u => u.username === username)) {
-        showToast('این نام کاربری قبلاً ثبت شده', 'warning');
-        return;
+        if (error) {
+          if (/already|registered/i.test(error.message)) showToast('این نام کاربری قبلاً ثبت شده', 'warning');
+          else dbError(error, 'ثبت‌نام انجام نشد: ' + error.message);
+          return;
+        }
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          showToast('این نام کاربری قبلاً ثبت شده', 'warning');
+          return;
+        }
+        if (!data.session) {
+          showToast('در Supabase گزینه Confirm email را خاموش کنید (Authentication → Providers → Email)', 'warning');
+          return;
+        }
+
+        // اولین کاربر سیستم خودکار مدیر می‌شود و مستقیم وارد می‌شود
+        const profile = await loadProfile(data.user.id);
+        form.reset();
+        if (profile && profile.status === 'approved') {
+          await enterApp(profile);
+          showToast('حساب مدیر ساخته شد و وارد شدید ✓', 'success');
+          return;
+        }
+
+        await sb.auth.signOut();
+        showToast('✓ ثبت‌نام انجام شد! پس از بررسی مدیریت، حساب شما فعال می‌شود.', 'success');
+        document.getElementById('loginTabBtn').click();
+      } catch (err) {
+        dbError(err, 'ثبت‌نام انجام نشد');
+      } finally {
+        setBusy(btn, false, 'ثبت‌نام');
       }
-      if (pending.some(u => u.username === username)) {
-        showToast('درخواست این نام کاربری در حال بررسی است', 'warning');
-        return;
-      }
-
-      pending.push({
-        id: 'pending_' + Date.now(),
-        username,
-        password,
-        role: 'user',
-        createdAt: Date.now(),
-        status: 'pending'
-      });
-      DB.setPendingUsers(pending);
-
-      showToast('✓ ثبت‌نام انجام شد! پس از بررسی مدیریت، حساب شما فعال می‌شود.', 'success');
-      document.getElementById('registerFormElement').reset();
-      document.getElementById('loginTabBtn').click();
     });
 
     /* ===== LOGOUT ===== */
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      removeUserFromOnline();
-      DB.clearSession();
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await stopPresence();
+      await sb.auth.signOut();
       currentUser = null;
+      pdfCache = [];
+      profileCache = [];
       showToast('خارج شدید', 'info');
       renderLogin();
     });
 
-    /* ===== ONLINE STATUS ===== */
-    function updateOnlineStatus() {
-      if (!currentUser) return;
-      const onlineUsers = DB.getOnlineUsers();
-      const existing = onlineUsers.find(u => u.id === currentUser.id);
-      const users = DB.getUsers();
-      const dbUser = users.find(u => u.id === currentUser.id);
-
-      if (!existing) {
-        onlineUsers.push({
-          id: currentUser.id,
-          username: currentUser.username,
-          role: currentUser.role,
-          password: dbUser ? dbUser.password : '***',
-          lastSeen: Date.now(),
-          loginTime: Date.now()
+    /* ===== ONLINE STATUS (REALTIME PRESENCE) ===== */
+    function startPresence() {
+      stopPresence();
+      presenceChannel = sb.channel('online-users', { config: { presence: { key: currentUser.id } } });
+      presenceChannel
+        .on('presence', { event: 'sync' }, () => {
+          const state = presenceChannel.presenceState();
+          onlineList = Object.values(state).map(arr => arr[0]).filter(Boolean);
+          updateOnlineUI();
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await presenceChannel.track({
+              id: currentUser.id,
+              username: currentUser.username,
+              role: currentUser.role,
+              since: Date.now()
+            });
+          }
         });
-      } else {
-        existing.lastSeen = Date.now();
-      }
-      DB.setOnlineUsers(onlineUsers);
-      updateOnlineUI();
     }
 
-    function removeUserFromOnline() {
-      if (!currentUser) return;
-      const onlineUsers = DB.getOnlineUsers();
-      DB.setOnlineUsers(onlineUsers.filter(u => u.id !== currentUser.id));
+    async function stopPresence() {
+      if (presenceChannel) {
+        try { await sb.removeChannel(presenceChannel); } catch (_) {}
+        presenceChannel = null;
+      }
+      onlineList = [];
     }
 
     function updateOnlineUI() {
-      const onlineUsers = DB.getOnlineUsers().filter(u => Date.now() - u.lastSeen < 5 * 60 * 1000);
       if (currentUser && currentUser.role === 'admin') {
         const statEl = document.getElementById('statOnlineUsers');
-        if (statEl) statEl.textContent = onlineUsers.length;
-        renderOnlineUsersList(onlineUsers);
+        if (statEl) statEl.textContent = onlineList.length;
+        renderOnlineUsersList(onlineList);
       }
     }
 
-    function renderOnlineUsersList(onlineUsers) {
+    function renderOnlineUsersList(users) {
       const list = document.getElementById('onlineUsersList');
       if (!list) return;
       list.innerHTML = '';
 
-      if (onlineUsers.length === 0) {
+      if (users.length === 0) {
         list.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">کاربری آنلاین نیست</p>';
         return;
       }
 
-      onlineUsers.forEach(user => {
+      users.forEach(user => {
         const item = document.createElement('div');
         item.className = 'glass-card p-3 rounded-lg flex items-center justify-between gap-2';
         item.innerHTML = `
@@ -1324,20 +1275,16 @@
             <span class="status-online"></span>
             <div class="min-w-0">
               <p class="font-bold text-xs text-white">${escapeHtml(user.username)}</p>
-              <p class="text-[10px] text-gray-400 font-mono">
-                ${user.role === 'admin' ? '🔐 مدیر' : '👤 کاربر'} • رمز: ${escapeHtml(user.password)}
-              </p>
+              <p class="text-[10px] text-gray-400 font-mono">${user.role === 'admin' ? '🔐 مدیر' : '👤 کاربر'}</p>
             </div>
           </div>
           <div class="text-[10px] text-cyan-300 font-mono whitespace-nowrap">
-            ${new Intl.DateTimeFormat('fa-IR', {hour: '2-digit', minute: '2-digit'}).format(new Date(user.lastSeen))}
+            ${new Intl.DateTimeFormat('fa-IR', { hour: '2-digit', minute: '2-digit' }).format(new Date(user.since || Date.now()))}
           </div>
         `;
         list.appendChild(item);
       });
     }
-
-    setInterval(updateOnlineStatus, 10000);
 
     /* ===== TAB NAV ===== */
     document.querySelectorAll('[data-tab]').forEach(btn => {
@@ -1351,8 +1298,8 @@
         document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
         document.getElementById('libraryTab').classList.toggle('hidden', tab !== 'library');
         document.getElementById('adminTab').classList.toggle('hidden', tab !== 'admin');
-        if (tab === 'admin') renderAdmin();
-        if (tab === 'library') renderLibrary();
+        if (tab === 'admin') refreshAdminData();
+        if (tab === 'library') refreshLibrary();
       });
     });
 
@@ -1362,7 +1309,7 @@
       const emptyState = document.getElementById('emptyLibraryState');
       const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
       const selectedCat = document.getElementById('categoryFilter').value;
-      const allPdfs = DB.getPdfs();
+      const allPdfs = pdfCache;
       const filteredPdfs = allPdfs.filter(pdf => {
         const matchSearch = pdf.name.toLowerCase().includes(searchQuery);
         const matchCat = selectedCat === 'all' || pdf.category === selectedCat;
@@ -1403,9 +1350,9 @@
             </div>
             <h3 class="font-bold text-sm text-white line-clamp-2 mb-2 break-words">${escapeHtml(pdf.name)}</h3>
             <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] text-gray-400 mb-4">
-              <span>📅 ${pdf.date || 'امروز'}</span>
+              <span>📅 ${fmtDate(pdf.created_at) || 'امروز'}</span>
               <span>•</span>
-              <span class="font-mono text-cyan-400/80">${pdf.storage === 'indexeddb' ? 'آپلود شده' : 'URL'}</span>
+              <span class="font-mono text-cyan-400/80">${pdf.file_path ? 'آپلود شده' : 'URL'}</span>
             </div>
           </div>
           <button class="view-doc-btn grad-btn w-full py-2 sm:py-2.5 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-2 shadow-md">
@@ -1430,10 +1377,10 @@
 
     /* ===== ADMIN PANEL ===== */
     function renderAdmin() {
-      const users = DB.getUsers();
-      const pendingUsers = DB.getPendingUsers();
-      const pdfs = DB.getPdfs();
-      const onlineUsers = DB.getOnlineUsers().filter(u => Date.now() - u.lastSeen < 5 * 60 * 1000);
+      const users = profileCache.filter(u => u.status === 'approved');
+      const pendingUsers = profileCache.filter(u => u.status === 'pending');
+      const pdfs = pdfCache;
+      const onlineUsers = onlineList;
 
       document.getElementById('statTotalPdfs').textContent = pdfs.length;
       document.getElementById('statPendingUsers').textContent = pendingUsers.length;
@@ -1456,7 +1403,7 @@
               <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">${user.username.charAt(0).toUpperCase()}</div>
               <div class="min-w-0">
                 <p class="font-bold text-xs text-white">${escapeHtml(user.username)}</p>
-                <p class="text-[9px] text-amber-400 font-mono">رمز: ${escapeHtml(user.password)}</p>
+                <p class="text-[9px] text-amber-400 font-mono">${fmtDate(user.created_at)}</p>
               </div>
             </div>
             <div class="flex items-center gap-1.5">
@@ -1484,7 +1431,7 @@
                 <p class="font-bold text-xs text-white truncate">${escapeHtml(user.username)}</p>
                 <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded font-bold ${user.role === 'admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'} shrink-0">${user.role === 'admin' ? '🔐' : '👤'}</span>
               </div>
-              <p class="text-[9px] sm:text-[10px] text-gray-400 font-mono truncate">رمز: ${escapeHtml(user.password)}</p>
+              <p class="text-[9px] sm:text-[10px] text-gray-400 font-mono truncate">${fmtDate(user.created_at)}</p>
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
@@ -1526,50 +1473,66 @@
     }
 
     /* ===== APPROVE / REJECT ===== */
-    function approvePendingUser(pendingUser) {
-      const users = DB.getUsers();
-      users.push({
-        id: 'u_' + Date.now(),
-        username: pendingUser.username,
-        password: pendingUser.password,
-        role: pendingUser.role,
-        createdAt: pendingUser.createdAt,
-        status: 'approved'
-      });
-      DB.setUsers(users);
-      DB.setPendingUsers(DB.getPendingUsers().filter(u => u.id !== pendingUser.id));
-      showToast(`کاربر «${pendingUser.username}» تأیید شد ✓`, 'success');
-      renderAdmin();
+    async function approvePendingUser(user) {
+      const { error } = await sb.from('profiles').update({ status: 'approved' }).eq('id', user.id);
+      if (error) { dbError(error, 'تأیید کاربر انجام نشد'); return; }
+      showToast(`کاربر «${user.username}» تأیید شد ✓`, 'success');
+      await refreshAdminData();
     }
 
-    function rejectPendingUser(pendingUser) {
-      DB.setPendingUsers(DB.getPendingUsers().filter(u => u.id !== pendingUser.id));
-      showToast(`درخواست «${pendingUser.username}» رد شد ✕`, 'info');
-      renderAdmin();
+    async function rejectPendingUser(user) {
+      const { error } = await sb.rpc('admin_delete_user', { target: user.id });
+      if (error) { dbError(error, 'رد درخواست انجام نشد'); return; }
+      showToast(`درخواست «${user.username}» رد شد ✕`, 'info');
+      await refreshAdminData();
     }
 
     /* ===== ADD USER ===== */
-    document.getElementById('addUserForm').addEventListener('submit', (e) => {
+    document.getElementById('addUserForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      if (!validateForm(document.getElementById('addUserForm'))) return;
+      const form = e.currentTarget;
+      if (!validateForm(form)) return;
 
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
       const role = document.getElementById('newUserRole').value;
 
-      if (username.length < 3) { showToast('نام کاربری حداقل ۳ حرف', 'error'); return; }
+      if (!USERNAME_RE.test(username)) { showToast('نام کاربری: ۳ تا ۳۰ حرف انگلیسی، عدد یا _ . -', 'error'); return; }
       if (password.length < 6) { showToast('رمز حداقل ۶ حرف', 'error'); return; }
 
-      const users = DB.getUsers();
-      if (users.some(u => u.username === username)) { showToast('نام کاربری تکراری', 'warning'); return; }
+      const btn = form.querySelector('button[type="submit"]');
+      setBusy(btn, true, 'در حال ثبت…');
+      try {
+        const { data, error } = await sbCreator.auth.signUp({
+          email: toEmail(username),
+          password,
+          options: { data: { username: username.toLowerCase() } }
+        });
+        if (error) {
+          if (/already|registered/i.test(error.message)) showToast('نام کاربری تکراری', 'warning');
+          else dbError(error, 'ساخت کاربر انجام نشد: ' + error.message);
+          return;
+        }
+        if (!data.user || (Array.isArray(data.user.identities) && data.user.identities.length === 0)) {
+          showToast('نام کاربری تکراری', 'warning');
+          return;
+        }
 
-      users.push({ id: 'u_' + Date.now(), username, password, role, createdAt: Date.now(), status: 'approved' });
-      DB.setUsers(users);
-      document.getElementById('newUsername').value = '';
-      document.getElementById('newPassword').value = '';
-      showToast(`کاربر «${username}» اضافه شد`, 'success');
-      renderAdmin();
+        // پروفایل را تریگر ساخته (منتظر تأیید)؛ مدیر همان لحظه تأیید و نقش را تعیین می‌کند
+        const { error: upErr } = await sb.from('profiles')
+          .update({ status: 'approved', role })
+          .eq('id', data.user.id);
+        if (upErr) { dbError(upErr, 'کاربر ساخته شد ولی تأیید نشد؛ از لیست منتظر تأیید، تأییدش کنید'); }
+        else showToast(`کاربر «${username}» اضافه شد`, 'success');
+
+        document.getElementById('newUsername').value = '';
+        document.getElementById('newPassword').value = '';
+        await refreshAdminData();
+      } catch (err) {
+        dbError(err, 'ساخت کاربر انجام نشد');
+      } finally {
+        setBusy(btn, false, 'ثبت کاربر');
+      }
     });
 
     /* ===== ADD PDF ===== */
@@ -1619,30 +1582,33 @@
 
     document.getElementById('addPdfForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      if (!validateForm(document.getElementById('addPdfForm'))) return;
+      const form = e.currentTarget;
+      if (!validateForm(form)) return;
 
       const title = document.getElementById('pdfTitleInput').value.trim();
       const category = document.getElementById('pdfCategoryInput').value;
       const url = document.getElementById('pdfUrlInput').value.trim();
+      const submitBtn = form.querySelector('button[type="submit"]');
 
       if (currentUploadMode === 'file') {
         if (!selectedUploadFile) { showToast('فایل PDF انتخاب کنید', 'warning'); return; }
         if (selectedUploadFile.size > 15 * 1024 * 1024) { showToast('حجم فایل نباید بیشتر از ۱۵MB باشد', 'error'); return; }
-        const submitBtn = e.currentTarget.querySelector('button[type="submit"]');
-        submitBtn?.classList.add('upload-busy');
-        if (submitBtn) submitBtn.textContent = 'در حال ذخیره…';
+        setBusy(submitBtn, true, 'در حال آپلود…');
         try {
-          await saveNewPdf({ name: title, category, url: null, file: selectedUploadFile });
-          resetAdminPdfForm();
+          const ok = await saveNewPdf({ name: title, category, file: selectedUploadFile });
+          if (ok) resetAdminPdfForm();
         } finally {
-          submitBtn?.classList.remove('upload-busy');
-          if (submitBtn) submitBtn.textContent = 'بارگذاری سند';
+          setBusy(submitBtn, false, 'بارگذاری سند');
         }
       } else {
-        if (!url) { showToast('URL وارد کنید', 'warning'); return; }
-        saveNewPdf({ name: title, category, url, data: null });
-        resetAdminPdfForm();
+        if (!/^https?:\/\//i.test(url)) { showToast('URL معتبر وارد کنید (http یا https)', 'warning'); return; }
+        setBusy(submitBtn, true, 'در حال ذخیره…');
+        try {
+          const ok = await saveNewPdf({ name: title, category, url });
+          if (ok) resetAdminPdfForm();
+        } finally {
+          setBusy(submitBtn, false, 'بارگذاری سند');
+        }
       }
     });
 
@@ -1655,34 +1621,39 @@
       document.getElementById('fileZoneSelected').classList.add('hidden');
     }
 
-    async function saveNewPdf(pdfData) {
-      const pdfs = DB.getPdfs();
-      const today = new Intl.DateTimeFormat('fa-IR').format(new Date());
-      const id = 'pdf_' + Date.now();
-      const record = {
-        id,
-        name: pdfData.name,
-        category: pdfData.category || 'عمومی',
-        date: today,
-        url: pdfData.url || null,
-        storage: null,
-        addedBy: currentUser.username
-      };
-
+    async function saveNewPdf({ name, category, url = null, file = null }) {
+      let filePath = null;
       try {
-        if (pdfData.file) {
-          await PdfBlobStore.put(id, pdfData.file);
-          record.storage = 'indexeddb';
+        if (file) {
+          // نام فایل در استوریج انگلیسی و یکتاست؛ نام اصلی در ستون name ذخیره می‌شود
+          filePath = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.pdf`;
+          const { error: upErr } = await sb.storage.from('pdfs').upload(filePath, file, {
+            contentType: 'application/pdf',
+            upsert: false
+          });
+          if (upErr) throw upErr;
         }
 
-        pdfs.unshift(record);
-        DB.setPdfs(pdfs);
-        showToast(`سند «${pdfData.name}» اضافه شد`, 'success');
+        const { error } = await sb.from('pdfs').insert({
+          name,
+          category: category || 'عمومی',
+          url: file ? null : url,
+          file_path: filePath,
+          added_by: currentUser.username
+        });
+        if (error) {
+          if (filePath) await sb.storage.from('pdfs').remove([filePath]);
+          throw error;
+        }
+
+        showToast(`سند «${name}» اضافه شد`, 'success');
+        await refreshPdfs();
         renderLibrary();
         renderAdmin();
+        return true;
       } catch (err) {
-        console.error('PDF storage error:', err);
-        showToast('ذخیره فایل انجام نشد. مرورگر را به‌روز کنید یا فضای ذخیره‌سازی را بررسی کنید.', 'error');
+        dbError(err, 'ذخیره سند انجام نشد');
+        return false;
       }
     }
 
@@ -1725,8 +1696,7 @@
       submitBtn?.classList.add('upload-busy');
       if (submitBtn) submitBtn.textContent = 'در حال ذخیره…';
       try {
-        await saveNewPdf({ name: title, category: cat, file: modalSelectedFile });
-        quickAddModal.classList.add('hidden');
+        if (await saveNewPdf({ name: title, category: cat, file: modalSelectedFile })) quickAddModal.classList.add('hidden');
       } finally {
         submitBtn?.classList.remove('upload-busy');
         if (submitBtn) submitBtn.textContent = 'ثبت سند';
@@ -1763,7 +1733,7 @@
       if (e.target === changePasswordModal) closeChangePasswordModal();
     });
 
-    document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
       if (!currentUser || currentUser.role !== 'admin') {
@@ -1775,37 +1745,32 @@
       const newPassword = document.getElementById('changePasswordNew').value;
       const confirmPassword = document.getElementById('changePasswordConfirm').value;
 
-      if (newPassword.length < 6) {
-        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد', 'error');
-        return;
-      }
+      if (newPassword.length < 6) { showToast('رمز عبور باید حداقل ۶ کاراکتر باشد', 'error'); return; }
+      if (newPassword !== confirmPassword) { showToast('رمزهای عبور مطابقت ندارند', 'error'); return; }
 
-      if (newPassword !== confirmPassword) {
-        showToast('رمزهای عبور مطابقت ندارند', 'error');
-        return;
-      }
-
-      const users = DB.getUsers();
-      const targetUser = users.find(u => u.id === changePasswordTargetUserId);
-
-      if (!targetUser) {
+      const targetId = changePasswordTargetUserId;
+      const target = profileCache.find(u => u.id === targetId);
+      if (!target) {
         closeChangePasswordModal();
         showToast('کاربر پیدا نشد', 'error');
         return;
       }
 
-      targetUser.password = newPassword;
-      DB.setUsers(users);
-
-      showToast(`رمز عبور «${targetUser.username}» با موفقیت تغییر کرد ✓`, 'success');
-
-      if (targetUser.id === currentUser.id) {
-        currentUser = { ...currentUser };
-        DB.setSession(currentUser);
+      const btn = e.currentTarget.querySelector('button[type="submit"]');
+      setBusy(btn, true);
+      try {
+        let error;
+        if (targetId === currentUser.id) {
+          ({ error } = await sb.auth.updateUser({ password: newPassword }));
+        } else {
+          ({ error } = await sb.rpc('admin_set_password', { target: targetId, new_password: newPassword }));
+        }
+        if (error) { dbError(error, 'تغییر رمز انجام نشد'); return; }
+        showToast(`رمز عبور «${target.username}» با موفقیت تغییر کرد ✓`, 'success');
+        closeChangePasswordModal();
+      } finally {
+        setBusy(btn, false);
       }
-
-      closeChangePasswordModal();
-      renderAdmin();
     });
 
     /* ===== DELETE ===== */
@@ -1815,13 +1780,14 @@
       document.getElementById('deleteModalTitle').textContent = 'حذف سند';
       document.getElementById('deleteModalDesc').innerHTML = `سند <strong class="text-white">«${escapeHtml(pdf.name)}»</strong> حذف شود؟`;
       deleteActionCallback = async () => {
-        try {
-          if (pdf.storage === 'indexeddb') await PdfBlobStore.delete(pdf.id);
-        } catch (err) {
-          console.warn('Could not remove PDF binary:', err);
+        const { error } = await sb.from('pdfs').delete().eq('id', pdf.id);
+        if (error) { dbError(error, 'حذف سند انجام نشد'); return; }
+        if (pdf.file_path) {
+          const { error: rmErr } = await sb.storage.from('pdfs').remove([pdf.file_path]);
+          if (rmErr) console.warn('Could not remove stored file:', rmErr);
         }
-        DB.setPdfs(DB.getPdfs().filter(p => p.id !== pdf.id));
         showToast('سند حذف شد', 'info');
+        await refreshPdfs();
         renderLibrary();
         renderAdmin();
       };
@@ -1831,10 +1797,11 @@
     function promptDeleteUser(user) {
       document.getElementById('deleteModalTitle').textContent = 'حذف کاربر';
       document.getElementById('deleteModalDesc').innerHTML = `کاربر <strong class="text-white">«${escapeHtml(user.username)}»</strong> حذف شود؟`;
-      deleteActionCallback = () => {
-        DB.setUsers(DB.getUsers().filter(u => u.id !== user.id));
+      deleteActionCallback = async () => {
+        const { error } = await sb.rpc('admin_delete_user', { target: user.id });
+        if (error) { dbError(error, 'حذف کاربر انجام نشد'); return; }
         showToast('کاربر حذف شد', 'info');
-        renderAdmin();
+        await refreshAdminData();
       };
       deleteModal.classList.remove('hidden');
     }
@@ -1862,15 +1829,16 @@
         const lib = await ensurePdfJs();
         let source;
 
-        if (pdf.storage === 'indexeddb') {
-          const blob = await PdfBlobStore.get(pdf.id);
-          if (!blob) throw new Error('Stored PDF was not found');
+        if (pdf.file_path) {
+          const { data: fileBlob, error: dlErr } = await sb.storage.from('pdfs').download(pdf.file_path);
+          if (dlErr || !fileBlob) throw dlErr || new Error('Stored PDF was not found');
           if (activePdfObjectUrl) URL.revokeObjectURL(activePdfObjectUrl);
-          activePdfObjectUrl = URL.createObjectURL(blob);
+          activePdfObjectUrl = URL.createObjectURL(fileBlob);
           source = activePdfObjectUrl;
         } else {
-          source = pdf.data || pdf.url;
+          source = pdf.url;
         }
+
 
         if (!source) throw new Error('PDF source is empty');
 
@@ -2015,16 +1983,13 @@
     /* ===== INIT ===== */
     window.addEventListener('DOMContentLoaded', async () => {
       try {
-        await migrateLegacyPdfData();
+        await initAuth();
       } catch (err) {
-        console.warn('PDF storage migration skipped:', err);
-      }
-      await initAuth();
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        console.error(err);
+        renderLogin();
+        showToast('اتصال به سرور برقرار نشد', 'error');
       }
     });
-  </script>
+    </script>
 </body>
 </html>
