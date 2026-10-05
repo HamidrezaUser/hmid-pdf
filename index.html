@@ -1621,17 +1621,80 @@
       document.getElementById('fileZoneSelected').classList.add('hidden');
     }
 
+    /* نوار پیشرفت آپلود */
+    const UploadProgress = {
+      el: null,
+      show(name) {
+        this.hide();
+        const el = document.createElement('div');
+        el.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-[220] w-[92%] max-w-sm glass rounded-2xl p-4 border border-violet-500/30 shadow-2xl';
+        el.innerHTML = `
+          <div class="flex items-center justify-between gap-3 text-xs font-semibold text-white mb-2">
+            <span class="truncate">⏳ در حال آپلود «${escapeHtml(name)}»</span>
+            <span data-pct class="font-mono text-cyan-300 shrink-0">0%</span>
+          </div>
+          <div class="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div data-bar class="h-full grad-btn" style="width:0%;transition:width .25s ease"></div>
+          </div>
+          <p data-note class="text-[10px] text-gray-400 mt-2">لطفاً تا پایان آپلود صفحه را نبندید…</p>`;
+        document.body.appendChild(el);
+        this.el = el;
+      },
+      set(percent) {
+        if (!this.el) return;
+        this.el.querySelector('[data-pct]').textContent = percent + '%';
+        this.el.querySelector('[data-bar]').style.width = percent + '%';
+        if (percent >= 100) this.el.querySelector('[data-note]').textContent = 'ارسال شد؛ در حال نهایی‌سازی روی سرور…';
+      },
+      hide() {
+        if (this.el) { this.el.remove(); this.el = null; }
+      }
+    };
+
+    // آپلود مستقیم به Storage با گزارش درصد پیشرفت
+    async function uploadWithProgress(path, file, onProgress) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) throw new Error('نشست شما منقضی شده؛ دوباره وارد شوید');
+
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${SUPABASE_URL}/storage/v1/object/pdfs/${path}`);
+        xhr.setRequestHeader('apikey', SUPABASE_KEY);
+        xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+        xhr.setRequestHeader('x-upsert', 'false');
+        xhr.timeout = 10 * 60 * 1000;
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) { resolve(); return; }
+          let msg = 'آپلود ناموفق بود (' + xhr.status + ')';
+          try { msg = JSON.parse(xhr.responseText).message || msg; } catch (_) {}
+          reject(new Error(msg));
+        };
+        xhr.onerror = () => reject(new Error('اتصال به سرور قطع شد؛ اینترنت یا VPN را بررسی کنید'));
+        xhr.ontimeout = () => reject(new Error('آپلود بیش از حد طول کشید؛ دوباره تلاش کنید'));
+
+        const form = new FormData();
+        form.append('cacheControl', '3600');
+        form.append('', file);
+        xhr.send(form);
+      });
+    }
+
     async function saveNewPdf({ name, category, url = null, file = null }) {
       let filePath = null;
       try {
         if (file) {
           // نام فایل در استوریج انگلیسی و یکتاست؛ نام اصلی در ستون name ذخیره می‌شود
           filePath = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.pdf`;
-          const { error: upErr } = await sb.storage.from('pdfs').upload(filePath, file, {
-            contentType: 'application/pdf',
-            upsert: false
-          });
-          if (upErr) throw upErr;
+          UploadProgress.show(name);
+          try {
+            await uploadWithProgress(filePath, file, (p) => UploadProgress.set(p));
+          } finally {
+            UploadProgress.hide();
+          }
         }
 
         const { error } = await sb.from('pdfs').insert({
@@ -1823,7 +1886,10 @@
 
       currentPageNum = 1;
       activeZoomScale = 1.6;
+      activePdfDoc = null;
       document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
+      viewerScrollArea.scrollTop = 0;
+      showViewerLoading('در حال بارگذاری فایل…');
 
       try {
         const lib = await ensurePdfJs();
@@ -1854,7 +1920,26 @@
         console.error('PDF Error:', err);
         showToast('خطا در بارگذاری فایل PDF', 'error');
         viewerModal.classList.add('hidden');
+      } finally {
+        hideViewerLoading();
       }
+    }
+
+    function showViewerLoading(text) {
+      hideViewerLoading();
+      const overlay = document.createElement('div');
+      overlay.id = 'viewerLoading';
+      overlay.className = 'absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-[#07070d]';
+      overlay.innerHTML = `
+        <div class="w-12 h-12 rounded-full border-4 border-violet-500/30 border-t-cyan-400 animate-spin"></div>
+        <p class="text-sm font-semibold text-gray-200">${escapeHtml(text)}</p>
+        <p class="text-[11px] text-gray-500">لطفاً چند لحظه صبر کنید</p>`;
+      document.getElementById('viewerScrollArea').appendChild(overlay);
+    }
+
+    function hideViewerLoading() {
+      const el = document.getElementById('viewerLoading');
+      if (el) el.remove();
     }
 
     async function renderPdfPage(pageNum) {
