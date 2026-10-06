@@ -2,21 +2,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#090910" />
+  <meta name="theme-color" content="#0c0c0e" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>PDF Hot 🔥</title>
-  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    (function () {
+      var gold = { 50:'#fffbea',100:'#fff3c4',200:'#ffe58a',300:'#ffd84d',400:'#f5c518',500:'#e6b200',600:'#c99700',700:'#a67c00',800:'#7a5c00',900:'#4a3800',950:'#2a2000' };
+      var neutral = { 50:'#fafafa',100:'#f5f5f5',200:'#e5e5e5',300:'#d4d4d4',400:'#a3a3a3',500:'#737373',600:'#525252',700:'#404040',800:'#262626',900:'#171717',950:'#0a0a0a' };
+      tailwind.config = { theme: { extend: { colors: {
+        violet: gold, purple: gold, fuchsia: gold, pink: gold, indigo: gold,
+        cyan: gold, sky: gold, blue: gold, gray: neutral, slate: neutral, zinc: neutral
+      } } } };
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/mourgen" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
   <style>
     .brand-hot {
-      font-family: 'MOURGEN', Georgia, serif !important;
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
+      font-weight: 800;
       letter-spacing: 1px;
       background: linear-gradient(135deg, #fde047, #fb923c 45%, #f43f5e);
       -webkit-background-clip: text;
@@ -56,7 +67,7 @@
     }
 
     body {
-      background: radial-gradient(1200px 700px at 85% -10%, rgba(139, 92, 246, 0.2), transparent 60%),
+      background: radial-gradient(1200px 700px at 85% -10%, rgba(245, 197, 24, 0.2), transparent 60%),
                   radial-gradient(1100px 600px at -10% 110%, rgba(6, 182, 212, 0.18), transparent 60%),
                   radial-gradient(800px 400px at 50% 50%, rgba(244, 63, 94, 0.08), transparent 70%),
                   var(--bg);
@@ -81,20 +92,20 @@
     }
 
     .glass-card:hover {
-      border-color: rgba(139, 92, 246, 0.4);
+      border-color: rgba(245, 197, 24, 0.4);
       transform: translateY(-3px);
-      box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.25);
+      box-shadow: 0 15px 35px -5px rgba(245, 197, 24, 0.25);
     }
 
     .grad-text {
-      background: linear-gradient(135deg, #c084fc, #38bdf8 50%, #f472b6);
+      background: linear-gradient(135deg, #ffe58a, #f5c518 55%, #c99700);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
 
     .grad-btn {
-      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      background: linear-gradient(135deg, #ffd84d, #e6b200);
       background-size: 200% 200%;
       transition: all 0.35s ease;
     }
@@ -124,8 +135,8 @@
 
     .input-field:focus {
       outline: none;
-      border-color: #8b5cf6;
-      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+      border-color: #f5c518;
+      box-shadow: 0 0 0 4px rgba(245, 197, 24, 0.2);
       background: rgba(15, 15, 30, 0.9);
     }
 
@@ -159,8 +170,8 @@
     }
 
     ::-webkit-scrollbar { width: 7px; height: 7px; }
-    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.35); border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(245, 197, 24, 0.35); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(245, 197, 24, 0.6); }
     ::-webkit-scrollbar-track { background: transparent; }
 
     .pdf-protected {
@@ -211,7 +222,7 @@
     }
 
     .nav-tab-btn.active {
-      color: #38bdf8;
+      color: #f5c518;
       font-weight: 700;
     }
 
@@ -222,7 +233,7 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      background: linear-gradient(90deg, #f5c518, #c99700);
       border-radius: 999px;
     }
 
@@ -270,7 +281,7 @@
     }
 
     #pdfPageNav button {
-      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      background: linear-gradient(135deg, #ffd84d, #e6b200);
       color: white;
       border: none;
       padding: 0.5rem 1rem;
@@ -302,14 +313,14 @@
     }
 
     footer a {
-      color: #f472b6;
+      color: #f5c518;
       text-decoration: none;
       font-weight: bold;
       transition: color 0.2s;
     }
 
     footer a:hover {
-      color: #ec4899;
+      color: #ffe58a;
     }
 
     /* ===== MOBILE / PERFORMANCE ===== */
@@ -345,7 +356,7 @@
 
     @media (max-width: 768px) {
       .nav-tab-btn.active::after { display: none; }
-      .nav-tab-btn.active { border-bottom: 2px solid #38bdf8; }
+      .nav-tab-btn.active { border-bottom: 2px solid #f5c518; }
 
       body {
         -webkit-tap-highlight-color: transparent;
@@ -431,6 +442,112 @@
       }
     }
   </style>
+
+  <style>
+    /* ===== THEME: Matte Black & Gold ===== */
+    :root {
+      --bg: #0c0c0e;
+      --card-bg: #141417;
+      --card-border: #26262b;
+      --text-main: #f5f5f5;
+      --text-muted: #a3a3a3;
+      --gold: #f5c518;
+      --gold-soft: #ffe58a;
+      --gold-deep: #c99700;
+    }
+
+    body {
+      background:
+        radial-gradient(900px 500px at 50% -15%, rgba(245, 197, 24, 0.06), transparent 65%),
+        #0c0c0e !important;
+    }
+
+    .glass {
+      background: #141417 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: 1px solid #26262b !important;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55) !important;
+    }
+
+    .glass-card {
+      background: #17171a !important;
+      backdrop-filter: none !important;
+      border: 1px solid #26262b !important;
+      border-radius: 14px;
+    }
+    .glass-card:hover {
+      border-color: rgba(245, 197, 24, 0.55) !important;
+      box-shadow: 0 12px 28px -8px rgba(245, 197, 24, 0.18) !important;
+    }
+
+    /* دکمه‌های طلایی با متن تیره */
+    .grad-btn {
+      background: linear-gradient(180deg, #ffd84d, #f5c518 55%, #e6b200) !important;
+      box-shadow: 0 6px 18px rgba(245, 197, 24, 0.18);
+    }
+    .grad-btn, .grad-btn * { color: #16130a !important; }
+    .grad-btn:hover {
+      box-shadow: 0 10px 26px rgba(245, 197, 24, 0.35) !important;
+      filter: brightness(1.05);
+    }
+    #pdfPageNav button { color: #16130a !important; }
+
+    .input-field {
+      background: #101012 !important;
+      border: 1px solid #2b2b30 !important;
+      border-radius: 12px;
+    }
+    .input-field:focus {
+      border-color: #f5c518 !important;
+      box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.15) !important;
+      background: #121214 !important;
+    }
+
+    #pdfPageNav { background: #141417 !important; border-top: 1px solid #26262b !important; }
+    footer { background: #0f0f11 !important; border-top: 1px solid #26262b !important; color: #8a8a8f !important; }
+
+    /* لوگوی PDF Hot به رنگ طلایی مات */
+    .brand-hot {
+      background: linear-gradient(135deg, #ffe58a, #f5c518 55%, #c99700) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      color: transparent !important;
+      filter: drop-shadow(0 3px 10px rgba(245, 197, 24, 0.25)) !important;
+    }
+
+    /* نوار رنگی بالای کارت‌ها */
+    .bg-gradient-to-r.from-violet-500, .bg-gradient-to-r.from-emerald-500 {
+      background-image: linear-gradient(90deg, transparent, #f5c518, transparent) !important;
+    }
+
+    ::selection { background: rgba(245, 197, 24, 0.3); }
+  </style>
+  <style>
+    /* ===== تمام‌صفحه‌ی PDF (با ورق زدن بدون خروج) ===== */
+    #pdfViewerModal.viewer-full { background: #000 !important; backdrop-filter: none !important; }
+    #pdfViewerModal.viewer-full .viewer-header { display: none !important; }
+    #pdfViewerModal.viewer-full #fsExitBtn { display: flex !important; transition: opacity .25s ease; }
+    #pdfViewerModal.viewer-full #viewerScrollArea {
+      padding: 0 !important; overflow: hidden !important; background: #000 !important; align-items: center;
+    }
+    #pdfViewerModal.viewer-full #viewerScrollArea > div {
+      max-width: 100% !important; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #pdfViewerModal.viewer-full #pdfCanvas {
+      width: auto !important; height: auto !important; max-width: 100%; max-height: 100%;
+      border: 0 !important; border-radius: 0 !important; object-fit: contain;
+    }
+    #pdfViewerModal.viewer-full #pdfPageNav {
+      position: absolute !important; left: 0; right: 0; bottom: 0; z-index: 160;
+      background: rgba(12, 12, 14, 0.85) !important; backdrop-filter: blur(10px);
+      padding-bottom: max(0.7rem, env(safe-area-inset-bottom));
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    #pdfViewerModal.viewer-full.controls-hidden #pdfPageNav { opacity: 0; transform: translateY(100%); pointer-events: none; }
+    #pdfViewerModal.viewer-full.controls-hidden #fsExitBtn { opacity: 0; pointer-events: none; }
+  </style>
 </head>
 
 <body class="pdf-protected relative flex flex-col min-h-screen">
@@ -459,9 +576,6 @@
     </defs>
   </svg>
 
-  <div class="blob" style="width: 550px; height: 550px; background: #7c3aed; top: -150px; right: -120px;"></div>
-  <div class="blob" style="width: 600px; height: 600px; background: #06b6d4; bottom: -180px; left: -160px; animation-delay: -5s;"></div>
-  <div class="blob" style="width: 400px; height: 400px; background: #ec4899; top: 40%; left: 30%; animation-delay: -9s;"></div>
 
   <!-- Toast -->
   <div id="toastContainer" class="fixed top-5 left-5 z-[200] flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
@@ -481,14 +595,16 @@
       <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-cyan-400 to-pink-500"></div>
 
       <div class="flex flex-col items-center text-center mb-8">
-        <div class="w-18 h-18 p-4 rounded-2xl grad-btn flex items-center justify-center mb-4 shadow-xl shadow-violet-900/40">
-          <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        <div class="w-16 h-16 flex items-center justify-center mb-3">
+          <svg class="w-14 h-14" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#f5c518" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2.5 4.5 5.5v5.8c0 4.6 3.1 8.2 7.5 10.2 4.4-2 7.5-5.6 7.5-10.2V5.5L12 2.5z" fill="rgba(245,197,24,0.08)"/>
+            <rect x="9" y="10.5" width="6" height="5" rx="1"/>
+            <path d="M10.2 10.5V9.2a1.8 1.8 0 0 1 3.6 0v1.3"/>
           </svg>
         </div>
         <h1 dir="ltr" class="flex items-center justify-center gap-2">
           <span class="brand-hot text-4xl sm:text-5xl">PDF Hot</span>
-          <svg class="fire-emoji w-10 h-10 sm:w-12 sm:h-12" viewBox="0 0 64 64" aria-hidden="true"><use href="#flame-icon"/></svg>
+          <svg class="fire-emoji w-10 h-10 sm:w-12 sm:h-12" width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><use href="#flame-icon"/></svg>
         </h1>
         <p class="text-xs sm:text-sm text-gray-300 mt-3 leading-relaxed">PDFهای داغ و تازه از تنور درآمده، فقط برای آدم‌های خوش‌سلیقه! 😄</p>
       </div>
@@ -510,8 +626,10 @@
           </div>
         </div>
 
+        <div id="captchaLogin" class="flex justify-center min-h-[0]"></div>
+
         <button type="submit" class="grad-btn w-full py-3.5 rounded-xl font-bold text-white text-sm shadow-lg mt-2">
-          ورود به سامانه
+          ورود به سایت
         </button>
       </form>
 
@@ -560,6 +678,8 @@
           </div>
         </div>
 
+        <div id="captchaRegister" class="flex justify-center"></div>
+
         <button type="submit" class="grad-btn w-full py-3.5 rounded-xl font-bold text-white text-sm shadow-lg mt-2">
           ثبت‌نام
         </button>
@@ -596,7 +716,7 @@
             <div class="flex items-center gap-2 flex-wrap">
               <h2 dir="ltr" class="flex items-center gap-1.5">
                 <span class="brand-hot text-xl sm:text-2xl">PDF Hot</span>
-                <svg class="fire-emoji w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 64 64" aria-hidden="true"><use href="#flame-icon"/></svg>
+                <svg class="fire-emoji w-6 h-6 sm:w-7 sm:h-7" width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><use href="#flame-icon"/></svg>
               </h2>
               <span id="roleBadge" class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 shrink-0">نقش</span>
             </div>
@@ -761,6 +881,7 @@
                   </select>
                 </div>
               </div>
+              <div id="captchaAddUser" class="flex justify-center"></div>
               <button type="submit" class="grad-btn w-full py-2.5 rounded-xl text-xs font-bold text-white shadow-md">ثبت کاربر</button>
             </form>
 
@@ -912,8 +1033,8 @@
   </div>
 
   <!-- ===== PDF VIEWER (PAGE BY PAGE) ===== -->
-  <div id="pdfViewerModal" class="fixed inset-0 z-[150] bg-[#090910]/95 backdrop-blur-xl hidden flex flex-col">
-    <div class="glass border-b border-white/10 px-3 sm:px-4 py-3 flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
+  <div id="pdfViewerModal" class="fixed inset-0 z-[150] bg-[#0c0c0e]/95 backdrop-blur-xl hidden flex flex-col">
+    <div class="viewer-header glass border-b border-white/10 px-3 sm:px-4 py-3 flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
       <div class="flex items-center gap-2 sm:gap-3 min-w-0">
         <button id="closeViewerBtn" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition shrink-0">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -923,13 +1044,18 @@
           <span class="text-[9px] text-gray-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> محافظت فعال</span>
         </div>
       </div>
-      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-        <button id="zoomOutBtn" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 flex items-center justify-center text-xs font-bold transition">−</button>
-        <span id="zoomLevelDisplay" class="text-xs font-mono text-cyan-300 w-10 text-center">160%</span>
-        <button id="zoomInBtn" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 flex items-center justify-center text-xs font-bold transition">+</button>
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="fullscreenBtn" title="تمام صفحه" aria-label="تمام صفحه" class="h-9 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 hover:text-white flex items-center gap-1.5 text-xs font-bold transition">
+          <svg class="w-4 h-4" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span>تمام صفحه</span>
+        </button>
       </div>
     </div>
-    <div id="viewerScrollArea" class="flex-1 overflow-auto relative p-3 sm:p-8 flex justify-center bg-[#07070d]">
+    <button id="fsExitBtn" aria-label="خروج از تمام صفحه" class="hidden fixed top-3 right-3 z-[160] h-10 px-3.5 rounded-full bg-black/60 border border-white/15 text-white flex items-center gap-1.5 text-xs font-bold backdrop-blur-md" style="top:max(0.75rem, env(safe-area-inset-top))">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4m16 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M4 16h3a2 2 0 0 1 2 2v3"/></svg>
+      <span>خروج</span>
+    </button>
+    <div id="viewerScrollArea" class="flex-1 overflow-auto relative p-3 sm:p-8 flex justify-center bg-[#09090b]">
       <div class="relative w-full max-w-2xl">
         <canvas id="pdfCanvas" class="w-full border border-white/10 rounded-lg shadow-2xl"></canvas>
         <div id="viewerWatermark" class="watermark-overlay" data-watermark="محرمانه"></div>
@@ -952,6 +1078,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
   <!-- ===== JAVASCRIPT ===== -->
   <script>
@@ -994,6 +1121,50 @@
     const sbCreator = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'arsh-creator' }
     });
+
+    /* ===== CLOUDFLARE TURNSTILE (تأیید انسان بودن) ===== */
+    // کلید عمومی (Site Key) ویجت Turnstile را اینجا بگذارید. خالی = کپچا غیرفعال
+    const TURNSTILE_SITE_KEY = '';
+
+    const captcha = {
+      ids: {},
+      tokens: {},
+      enabled: () => !!TURNSTILE_SITE_KEY,
+      mount(containerId) {
+        if (!this.enabled() || this.ids[containerId] !== undefined) return;
+        if (!window.turnstile) return;
+        this.ids[containerId] = window.turnstile.render('#' + containerId, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme: 'dark',
+          language: 'fa',
+          callback: (t) => { this.tokens[containerId] = t; },
+          'expired-callback': () => { this.tokens[containerId] = null; },
+          'error-callback': () => { this.tokens[containerId] = null; }
+        });
+      },
+      mountAll() {
+        ['captchaLogin', 'captchaRegister', 'captchaAddUser'].forEach(id => this.mount(id));
+      },
+      // توکن را برمی‌گرداند و ویجت را برای دفعه بعد ریست می‌کند (هر توکن فقط یک‌بار معتبر است)
+      take(containerId) {
+        if (!this.enabled()) return undefined;
+        const t = this.tokens[containerId] || null;
+        this.tokens[containerId] = null;
+        if (window.turnstile && this.ids[containerId] !== undefined) {
+          try { window.turnstile.reset(this.ids[containerId]); } catch (_) {}
+        }
+        return t;
+      },
+      ready() { return !this.enabled() || !!window.turnstile; }
+    };
+
+    // ویجت‌ها بعد از لود شدن اسکریپت Cloudflare ساخته می‌شوند
+    (function waitForTurnstile(tries) {
+      if (!captcha.enabled()) return;
+      if (window.turnstile) { captcha.mountAll(); return; }
+      if (tries > 100) return;
+      setTimeout(() => waitForTurnstile(tries + 1), 150);
+    })(0);
 
     const toEmail = (username) => `${username.trim().toLowerCase()}@${EMAIL_DOMAIN}`;
 
@@ -1178,9 +1349,19 @@
       const password = document.getElementById('loginPassword').value;
       const btn = form.querySelector('button[type="submit"]');
 
+      if (captcha.enabled() && !captcha.tokens.captchaLogin) {
+        showToast('لطفاً تأیید «من ربات نیستم» را کامل کنید', 'warning');
+        return;
+      }
+      const captchaToken = captcha.take('captchaLogin');
+
       setBusy(btn, true, 'در حال ورود…');
       try {
-        const { data, error } = await sb.auth.signInWithPassword({ email: toEmail(username), password });
+        const { data, error } = await sb.auth.signInWithPassword({
+          email: toEmail(username),
+          password,
+          options: { captchaToken }
+        });
         if (error) { showToast('نام کاربری یا رمز عبور اشتباه است', 'error'); return; }
 
         const profile = await loadProfile(data.user.id);
@@ -1201,7 +1382,7 @@
       } catch (err) {
         dbError(err, 'ورود انجام نشد');
       } finally {
-        setBusy(btn, false, 'ورود به سامانه');
+        setBusy(btn, false, 'ورود به سایت');
       }
     });
 
@@ -1224,12 +1405,18 @@
       if (password !== confirm) { showToast('رمزها مطابقت ندارند', 'error'); return; }
 
       const btn = form.querySelector('button[type="submit"]');
+      if (captcha.enabled() && !captcha.tokens.captchaRegister) {
+        showToast('لطفاً تأیید «من ربات نیستم» را کامل کنید', 'warning');
+        return;
+      }
+      const captchaToken = captcha.take('captchaRegister');
+
       setBusy(btn, true, 'در حال ثبت‌نام…');
       try {
         const { data, error } = await sb.auth.signUp({
           email: toEmail(username),
           password,
-          options: { data: { username: username.toLowerCase() } }
+          options: { data: { username: username.toLowerCase() }, captchaToken }
         });
 
         if (error) {
@@ -1558,12 +1745,18 @@
       if (password.length < 6) { showToast('رمز حداقل ۶ حرف', 'error'); return; }
 
       const btn = form.querySelector('button[type="submit"]');
+      if (captcha.enabled() && !captcha.tokens.captchaAddUser) {
+        showToast('لطفاً تأیید «من ربات نیستم» را کامل کنید', 'warning');
+        return;
+      }
+      const captchaToken = captcha.take('captchaAddUser');
+
       setBusy(btn, true, 'در حال ثبت…');
       try {
         const { data, error } = await sbCreator.auth.signUp({
           email: toEmail(username),
           password,
-          options: { data: { username: username.toLowerCase() } }
+          options: { data: { username: username.toLowerCase() }, captchaToken }
         });
         if (error) {
           if (/already|registered/i.test(error.message)) showToast('نام کاربری تکراری', 'warning');
@@ -1944,7 +2137,6 @@
       currentPageNum = 1;
       activeZoomScale = 1.6;
       activePdfDoc = null;
-      document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
       viewerScrollArea.scrollTop = 0;
       showViewerLoading('در حال بارگذاری فایل…');
 
@@ -1986,7 +2178,7 @@
       hideViewerLoading();
       const overlay = document.createElement('div');
       overlay.id = 'viewerLoading';
-      overlay.className = 'absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-[#07070d]';
+      overlay.className = 'absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-[#09090b]';
       overlay.innerHTML = `
         <div class="w-12 h-12 rounded-full border-4 border-violet-500/30 border-t-cyan-400 animate-spin"></div>
         <p class="text-sm font-semibold text-gray-200">${escapeHtml(text)}</p>
@@ -2052,19 +2244,8 @@
       renderPdfPage(pageNum);
     });
 
-    document.getElementById('zoomInBtn').addEventListener('click', async () => {
-      activeZoomScale = Math.min(3.25, activeZoomScale + 0.25);
-      document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
-      await renderPdfPage(currentPageNum);
-    });
-
-    document.getElementById('zoomOutBtn').addEventListener('click', async () => {
-      activeZoomScale = Math.max(0.5, activeZoomScale - 0.25);
-      document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
-      await renderPdfPage(currentPageNum);
-    });
-
     document.getElementById('closeViewerBtn').addEventListener('click', () => {
+      exitViewerFullscreen();
       document.getElementById('pdfViewerModal').classList.add('hidden');
       activePdfDoc = null;
       if (activePdfObjectUrl) {
@@ -2073,11 +2254,75 @@
       }
     });
 
+    /* ===== FULLSCREEN VIEWER ===== */
+    const viewerModalEl = document.getElementById('pdfViewerModal');
+    let viewerControlsTimer = null;
+    let usedNativeFullscreen = false;
+
+    function showViewerControls() {
+      viewerModalEl.classList.remove('controls-hidden');
+      clearTimeout(viewerControlsTimer);
+      if (viewerModalEl.classList.contains('viewer-full')) {
+        viewerControlsTimer = setTimeout(() => viewerModalEl.classList.add('controls-hidden'), 3500);
+      }
+    }
+
+    async function enterViewerFullscreen() {
+      viewerModalEl.classList.add('viewer-full');
+      // روی گوشی‌هایی که پشتیبانی می‌کنند (اندروید و دسکتاپ) تمام‌صفحه‌ی واقعی؛ در آیفون حالت تمام‌صفحه‌ی داخل برنامه
+      try {
+        const req = viewerModalEl.requestFullscreen || viewerModalEl.webkitRequestFullscreen;
+        if (req) { await req.call(viewerModalEl); usedNativeFullscreen = true; }
+      } catch (_) { usedNativeFullscreen = false; }
+      showViewerControls();
+      if (activePdfDoc) setTimeout(() => renderPdfPage(currentPageNum), 120);
+    }
+
+    function exitViewerFullscreen() {
+      clearTimeout(viewerControlsTimer);
+      const wasFull = viewerModalEl.classList.contains('viewer-full');
+      viewerModalEl.classList.remove('viewer-full', 'controls-hidden');
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fsEl) {
+        try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (_) {}
+      }
+      usedNativeFullscreen = false;
+      if (wasFull && activePdfDoc) setTimeout(() => renderPdfPage(currentPageNum), 120);
+    }
+
+    document.getElementById('fullscreenBtn').addEventListener('click', enterViewerFullscreen);
+    document.getElementById('fsExitBtn').addEventListener('click', exitViewerFullscreen);
+
+    // وقتی کاربر با دکمه‌ی خود مرورگر (یا Esc) از تمام‌صفحه‌ی واقعی خارج شد، حالت ما هم بسته شود
+    function onNativeFullscreenChange() {
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fsEl && usedNativeFullscreen && viewerModalEl.classList.contains('viewer-full')) {
+        usedNativeFullscreen = false;
+        viewerModalEl.classList.remove('viewer-full', 'controls-hidden');
+        if (activePdfDoc) setTimeout(() => renderPdfPage(currentPageNum), 120);
+      }
+    }
+    document.addEventListener('fullscreenchange', onNativeFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onNativeFullscreenChange);
+
+    // یک ضربه روی صفحه: نمایش/مخفی کردن دکمه‌ها (فقط در تمام‌صفحه)
+    document.getElementById('viewerScrollArea').addEventListener('click', () => {
+      if (!viewerModalEl.classList.contains('viewer-full')) return;
+      if (viewerModalEl.classList.contains('controls-hidden')) showViewerControls();
+      else { clearTimeout(viewerControlsTimer); viewerModalEl.classList.add('controls-hidden'); }
+    });
+
+    // با هر بار ورق زدن، دکمه‌ها دوباره کمی نمایش داده می‌شوند و تمام‌صفحه حفظ می‌شود
+    ['prevPageBtn', 'nextPageBtn'].forEach(id => {
+      document.getElementById(id).addEventListener('click', () => {
+        if (viewerModalEl.classList.contains('viewer-full')) showViewerControls();
+      });
+    });
+
     /* ===== MOBILE PDF GESTURES ===== */
     const viewerGestureArea = document.getElementById('viewerScrollArea');
     let touchStartX = 0;
     let touchStartY = 0;
-    let lastTapTime = 0;
 
     viewerGestureArea.addEventListener('touchstart', (e) => {
       const touch = e.changedTouches[0];
@@ -2089,19 +2334,11 @@
       const touch = e.changedTouches[0];
       const dx = touch.clientX - touchStartX;
       const dy = touch.clientY - touchStartY;
-      if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.25) {
         if (dx < 0 && currentPageNum < (activePdfDoc?.numPages || 0)) renderPdfPage(currentPageNum + 1);
         if (dx > 0 && currentPageNum > 1) renderPdfPage(currentPageNum - 1);
-        return;
+        if (viewerModalEl.classList.contains('viewer-full')) showViewerControls();
       }
-
-      const now = Date.now();
-      if (now - lastTapTime < 300) {
-        activeZoomScale = activeZoomScale < 2.2 ? 2.2 : 1.6;
-        document.getElementById('zoomLevelDisplay').textContent = Math.round(activeZoomScale * 100) + '%';
-        renderPdfPage(currentPageNum);
-      }
-      lastTapTime = now;
     }, { passive: true });
 
     let resizeTimer = null;
@@ -2118,7 +2355,12 @@
 
     document.addEventListener('keydown', (e) => {
       const isOpen = !document.getElementById('pdfViewerModal').classList.contains('hidden');
-      if (isOpen && e.key === 'Escape') document.getElementById('closeViewerBtn').click();
+      if (isOpen && e.key === 'Escape') {
+        if (viewerModalEl.classList.contains('viewer-full')) exitViewerFullscreen();
+        else document.getElementById('closeViewerBtn').click();
+      }
+      if (isOpen && (e.key === 'ArrowLeft' || e.key === 'PageDown')) document.getElementById('nextPageBtn').click();
+      if (isOpen && (e.key === 'ArrowRight' || e.key === 'PageUp')) document.getElementById('prevPageBtn').click();
       if (isOpen && (e.ctrlKey || e.metaKey) && ['p', 's', 'c', 'u'].includes(e.key.toLowerCase())) e.preventDefault();
     });
 
