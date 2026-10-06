@@ -828,6 +828,24 @@
           <p class="text-[11px] font-bold text-amber-300 mb-1">پیام مدیریت برای شما</p>
           <p id="userMessageText" class="text-sm text-white leading-7 whitespace-pre-wrap break-words"></p>
           <p id="userMessageDate" class="text-[10px] text-gray-500 mt-1.5 font-mono"></p>
+
+          <!-- پاسخ کاربر (فقط جواب به همین پیام) -->
+          <div id="userReplyView" class="hidden mt-3 rounded-xl bg-white/5 border border-white/10 px-3 py-2.5">
+            <p class="text-[10px] font-bold text-emerald-300 mb-1">✓ پاسخ شما ارسال شد</p>
+            <p id="userReplyText" class="text-xs text-gray-200 leading-6 whitespace-pre-wrap break-words"></p>
+          </div>
+          <button id="userReplyOpen" type="button" class="hidden mt-3 text-[11px] font-bold px-3.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition">↩ پاسخ دادن</button>
+          <div id="userReplyBox" class="hidden mt-3 space-y-2">
+            <textarea id="userReplyInput" rows="3" maxlength="300" class="input-field w-full px-3 py-2.5 rounded-xl text-xs leading-6 resize-none" placeholder="پاسختان را بنویسید…"></textarea>
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span id="userReplyCounter" class="text-[10px] text-gray-500 font-mono whitespace-nowrap">0 / 300</span>
+              <div class="flex items-center gap-2">
+                <button id="userReplyCancel" type="button" class="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-gray-300 transition whitespace-nowrap">انصراف</button>
+                <button id="userReplySend" type="button" class="grad-btn text-[11px] font-bold px-4 py-1.5 rounded-lg whitespace-nowrap">ارسال پاسخ</button>
+              </div>
+            </div>
+            <p class="text-[10px] text-gray-500">فقط یک پاسخ برای هر پیام ثبت می‌شود.</p>
+          </div>
         </div>
         <button id="userMessageClose" type="button" aria-label="بستن پیام" class="shrink-0 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">✕</button>
       </div>
@@ -1108,7 +1126,7 @@
 
   <!-- ===== ADMIN: پیام اختصاصی به کاربر ===== -->
   <div id="userMessageModal" class="fixed inset-0 z-[160] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass w-full max-w-md rounded-3xl p-5 sm:p-7 relative border border-amber-500/20 shadow-2xl">
+    <div class="glass w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl p-5 sm:p-7 relative border border-amber-500/20 shadow-2xl">
       <div class="flex items-center justify-between pb-4 mb-5 border-b border-white/10">
         <div>
           <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2"><span>💬</span> پیام اختصاصی</h3>
@@ -1117,17 +1135,27 @@
         <button id="closeUserMessageModal" type="button" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">✕</button>
       </div>
 
+      <div id="userMessageHistoryWrap" class="hidden mb-4">
+        <p class="text-[10px] font-bold text-gray-400 mb-2">تاریخچه گفتگو</p>
+        <div id="userMessageHistory" class="max-h-60 overflow-y-auto rounded-xl bg-black/30 border border-white/10 p-2.5 flex flex-col gap-2"></div>
+      </div>
+
+      <div id="userMessageReplyView" class="hidden mb-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-3">
+        <p class="text-[10px] font-bold text-emerald-300 mb-1">↩ پاسخ کاربر <span id="userMessageReplyDate" class="font-mono font-normal text-emerald-400/70"></span></p>
+        <p id="userMessageReplyText" class="text-sm text-white leading-7 whitespace-pre-wrap break-words"></p>
+      </div>
+
       <form id="userMessageForm" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-2">متن پیام</label>
-          <textarea id="userMessageInput" rows="5" maxlength="500" required class="input-field w-full px-3.5 py-3 rounded-xl text-sm leading-7 resize-none" placeholder="پیامتان را بنویسید…"></textarea>
+          <textarea id="userMessageInput" rows="5" maxlength="500" required class="input-field w-full px-3.5 py-3 rounded-xl text-sm leading-7 resize-none" placeholder="پیام جدید را بنویسید…"></textarea>
           <div class="flex items-center justify-between mt-1.5">
             <p class="text-[10px] text-gray-500">این پیام بالای صفحه‌ی همین کاربر نمایش داده می‌شود.</p>
             <p id="userMessageCounter" class="text-[10px] text-gray-500 font-mono">0 / 500</p>
           </div>
         </div>
         <div class="flex gap-2 pt-1">
-          <button id="clearUserMessageBtn" type="button" class="hidden px-3 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 border border-rose-500/20 transition">حذف پیام</button>
+          <button id="clearUserMessageBtn" type="button" class="hidden px-3 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 border border-rose-500/20 transition">برداشتن پیام</button>
           <button id="cancelUserMessageBtn" type="button" class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-gray-300 transition">انصراف</button>
           <button type="submit" class="flex-1 grad-btn py-2.5 rounded-xl text-xs font-bold shadow-lg">ارسال پیام</button>
         </div>
@@ -1285,6 +1313,10 @@
       try { return iso ? new Intl.DateTimeFormat('fa-IR').format(new Date(iso)) : ''; } catch { return ''; }
     }
 
+    function fmtDateTime(iso) {
+      try { return iso ? new Intl.DateTimeFormat('fa-IR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(iso)) : ''; } catch { return ''; }
+    }
+
     function setBusy(btn, busy, label) {
       if (!btn) return;
       btn.classList.toggle('upload-busy', busy);
@@ -1381,8 +1413,9 @@
       await Promise.all([refreshPdfs(), refreshProfiles()]);
       renderApp();
       startPresence();
-      applyUserMessage(profile.admin_message, profile.admin_message_at);
+      applyUserMessage(profile);
       startMessagePolling();
+      startAdminReplyPolling();
     }
 
     async function initAuth() {
@@ -1569,6 +1602,7 @@
     /* ===== LOGOUT ===== */
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       stopMessagePolling();
+      stopAdminReplyPolling();
       document.getElementById('userMessageBanner').classList.add('hidden');
       await stopPresence();
       await sb.auth.signOut();
@@ -1735,23 +1769,49 @@
     document.getElementById('searchInput').addEventListener('input', renderLibrary);
     document.getElementById('categoryFilter').addEventListener('change', renderLibrary);
 
-    /* ===== USER MESSAGE (BANNER) ===== */
-    let currentMessageStamp = null;
+    /* ===== USER MESSAGE (BANNER + REPLY) ===== */
+    let currentMessageKey = null;   // کلید پیام فعلی (برای تشخیص تغییر)
+    let currentMessageStamp = null; // کلید «بستن پیام»
     let messagePollTimer = null;
 
     function dismissKey() { return 'pdfhot_msg_dismissed_' + (currentUser ? currentUser.id : ''); }
     function getDismissed() { try { return localStorage.getItem(dismissKey()); } catch (_) { return null; } }
     function setDismissed(v) { try { localStorage.setItem(dismissKey(), v); } catch (_) {} }
 
-    function applyUserMessage(text, stamp) {
+    function messageKeyOf(d) {
+      const msg = (d && d.admin_message || '').trim();
+      if (!msg) return null;
+      return (d.admin_message_at || msg) + '|' + (d.user_reply_at || '');
+    }
+
+    function applyUserMessage(d) {
       const banner = document.getElementById('userMessageBanner');
-      const clean = (text || '').trim();
+      const clean = ((d && d.admin_message) || '').trim();
+      currentMessageKey = messageKeyOf(d);
       if (!clean) { banner.classList.add('hidden'); currentMessageStamp = null; return; }
-      const key = stamp || clean;
-      currentMessageStamp = key;
-      if (getDismissed() === key) { banner.classList.add('hidden'); return; }
+
+      const stamp = d.admin_message_at || clean;
+      currentMessageStamp = stamp;
+      if (getDismissed() === stamp) { banner.classList.add('hidden'); return; }
+
       document.getElementById('userMessageText').textContent = clean;
-      document.getElementById('userMessageDate').textContent = stamp ? fmtDate(stamp) : '';
+      document.getElementById('userMessageDate').textContent = d.admin_message_at ? fmtDate(d.admin_message_at) : '';
+
+      const replyView = document.getElementById('userReplyView');
+      const openBtn = document.getElementById('userReplyOpen');
+      const box = document.getElementById('userReplyBox');
+      const reply = (d.user_reply || '').trim();
+      if (reply) {
+        document.getElementById('userReplyText').textContent = reply;
+        replyView.classList.remove('hidden');
+        openBtn.classList.add('hidden');
+        box.classList.add('hidden');
+      } else {
+        replyView.classList.add('hidden');
+        // اگر کاربر وسط نوشتن است، باکس را نبند
+        if (box.classList.contains('hidden')) openBtn.classList.remove('hidden');
+      }
+
       const wasHidden = banner.classList.contains('hidden');
       banner.classList.remove('hidden');
       if (wasHidden) window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1762,24 +1822,67 @@
       document.getElementById('userMessageBanner').classList.add('hidden');
     });
 
-    async function pollUserMessage() {
+    // ---- پاسخ دادن ----
+    const replyInput = document.getElementById('userReplyInput');
+    document.getElementById('userReplyOpen').addEventListener('click', () => {
+      document.getElementById('userReplyOpen').classList.add('hidden');
+      document.getElementById('userReplyBox').classList.remove('hidden');
+      replyInput.focus();
+    });
+    document.getElementById('userReplyCancel').addEventListener('click', () => {
+      replyInput.value = '';
+      document.getElementById('userReplyCounter').textContent = '0 / 300';
+      document.getElementById('userReplyBox').classList.add('hidden');
+      document.getElementById('userReplyOpen').classList.remove('hidden');
+    });
+    replyInput.addEventListener('input', () => {
+      document.getElementById('userReplyCounter').textContent = replyInput.value.length + ' / 300';
+    });
+
+    document.getElementById('userReplySend').addEventListener('click', async () => {
+      const text = replyInput.value.trim();
+      if (!text) { showToast('پاسخ را بنویسید', 'warning'); return; }
+      const btn = document.getElementById('userReplySend');
+      setBusy(btn, true);
+      try {
+        const { error } = await sb.rpc('reply_to_admin', { reply_text: text });
+        if (error) {
+          if (/no open message/i.test(error.message || '')) showToast('این پیام قبلاً پاسخ داده شده یا حذف شده است', 'warning');
+          else if (/reply_to_admin|function/i.test(error.message || '')) showToast('ارسال پاسخ هنوز فعال نشده است (SQL اجرا نشده)', 'error');
+          else dbError(error, 'ارسال پاسخ انجام نشد');
+          await pollUserMessage(true);
+          return;
+        }
+        replyInput.value = '';
+        document.getElementById('userReplyCounter').textContent = '0 / 300';
+        document.getElementById('userReplyBox').classList.add('hidden');
+        showToast('پاسخ شما برای مدیریت ارسال شد ✓', 'success');
+        await pollUserMessage(true);
+      } finally {
+        setBusy(btn, false);
+      }
+    });
+
+    async function pollUserMessage(force) {
       if (!currentUser) return;
-      const { data, error } = await sb.from('profiles').select('admin_message, admin_message_at').eq('id', currentUser.id).maybeSingle();
+      const { data, error } = await sb.from('profiles')
+        .select('admin_message, admin_message_at, user_reply, user_reply_at')
+        .eq('id', currentUser.id).maybeSingle();
       if (error || !data) return;
-      const key = (data.admin_message || '').trim() ? (data.admin_message_at || data.admin_message) : null;
-      if (key !== currentMessageStamp) applyUserMessage(data.admin_message, data.admin_message_at);
+      if (force || messageKeyOf(data) !== currentMessageKey) applyUserMessage(data);
     }
 
     function startMessagePolling() {
       stopMessagePolling();
-      messagePollTimer = setInterval(pollUserMessage, 30000);
+      messagePollTimer = setInterval(() => pollUserMessage(false), 30000);
     }
     function stopMessagePolling() {
       if (messagePollTimer) { clearInterval(messagePollTimer); messagePollTimer = null; }
       currentMessageStamp = null;
+      currentMessageKey = null;
     }
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) pollUserMessage();
+      if (!document.hidden) { pollUserMessage(false); pollAdminReplies(); }
     });
 
     /* ===== ADMIN: SEND MESSAGE TO A USER ===== */
@@ -1795,12 +1898,50 @@
     function openUserMessageModal(user) {
       messageTargetUser = user;
       document.getElementById('userMessageUserLabel').textContent = 'برای: ' + user.username;
-      userMessageInput.value = user.admin_message || '';
+      userMessageInput.value = ''; // هر ارسال یک پیام جدید در گفتگوست
       document.getElementById('clearUserMessageBtn').classList.toggle('hidden', !user.admin_message);
+      loadMessageHistory(user);
+      const rv = document.getElementById('userMessageReplyView');
+      if (user.user_reply) {
+        document.getElementById('userMessageReplyText').textContent = user.user_reply;
+        document.getElementById('userMessageReplyDate').textContent = user.user_reply_at ? '· ' + fmtDate(user.user_reply_at) : '';
+        rv.classList.remove('hidden');
+        markReplySeen(user);
+        updateReplyBadge();
+        renderAdmin();
+      } else {
+        rv.classList.add('hidden');
+      }
       updateMessageCounter();
       userMessageModal.classList.remove('hidden');
       setTimeout(() => userMessageInput.focus(), 50);
     }
+    async function loadMessageHistory(user) {
+      const wrap = document.getElementById('userMessageHistoryWrap');
+      const box = document.getElementById('userMessageHistory');
+      const fallbackReply = document.getElementById('userMessageReplyView');
+      wrap.classList.add('hidden');
+      box.innerHTML = '';
+      const { data, error } = await sb.from('message_log').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
+      if (!messageTargetUser || messageTargetUser.id !== user.id) return; // پنجره عوض شده
+      if (error || !data || data.length === 0) return; // بدون تاریخچه: همان نمای ساده می‌ماند
+      data.forEach(m => {
+        const mine = m.sender === 'admin';
+        const bubble = document.createElement('div');
+        bubble.className = 'max-w-[88%] rounded-2xl px-3 py-2 ' + (mine
+          ? 'self-start bg-amber-500/15 border border-amber-500/30'
+          : 'self-end bg-emerald-500/15 border border-emerald-500/30');
+        bubble.innerHTML = `
+          <p class="text-[9px] font-bold mb-0.5 ${mine ? 'text-amber-300' : 'text-emerald-300'}">${mine ? 'شما (مدیر)' : escapeHtml(user.username)}</p>
+          <p class="text-xs text-white leading-6 whitespace-pre-wrap break-words">${escapeHtml(m.body)}</p>
+          <p class="text-[9px] text-gray-500 mt-1 font-mono">${fmtDateTime(m.created_at)}</p>`;
+        box.appendChild(bubble);
+      });
+      fallbackReply.classList.add('hidden'); // تاریخچه جای نمای ساده را می‌گیرد
+      wrap.classList.remove('hidden');
+      box.scrollTop = box.scrollHeight;
+    }
+
     function closeUserMessageModal() {
       userMessageModal.classList.add('hidden');
       messageTargetUser = null;
@@ -1812,18 +1953,19 @@
     async function saveUserMessage(text) {
       if (!messageTargetUser || !currentUser || currentUser.role !== 'admin') return;
       const clean = (text || '').trim();
-      const payload = clean
-        ? { admin_message: clean, admin_message_at: new Date().toISOString() }
-        : { admin_message: null, admin_message_at: null };
-      const { error } = await sb.from('profiles').update(payload).eq('id', messageTargetUser.id);
+      const target = messageTargetUser;
+      const { error } = clean
+        ? await sb.rpc('admin_send_message', { target: target.id, msg: clean })
+        : await sb.rpc('admin_clear_message', { target: target.id });
       if (error) {
-        if (/admin_message/i.test(error.message || '')) showToast('ابتدا فایل SQL پیام‌ها را در Supabase اجرا کنید', 'error');
+        if (/admin_send_message|admin_clear_message|message_log|function/i.test(error.message || '')) showToast('ابتدا فایل SQL پیام‌ها را (نسخه‌ی جدید) در Supabase اجرا کنید', 'error');
         else dbError(error, 'ارسال پیام انجام نشد');
         return;
       }
-      showToast(clean ? `پیام برای «${messageTargetUser.username}» ارسال شد ✓` : 'پیام حذف شد', 'success');
+      showToast(clean ? `پیام برای «${target.username}» ارسال شد ✓` : 'پیام از بالای صفحه‌ی کاربر برداشته شد', 'success');
       closeUserMessageModal();
       await refreshProfiles();
+      updateReplyBadge();
       renderAdmin();
     }
 
@@ -1834,6 +1976,68 @@
       try { await saveUserMessage(userMessageInput.value); } finally { setBusy(btn, false); }
     });
     document.getElementById('clearUserMessageBtn').addEventListener('click', () => saveUserMessage(''));
+
+    /* ===== ADMIN: REPLIES (NOTIFICATIONS) ===== */
+    let adminReplyTimer = null;
+    let knownReplyKeys = null;
+
+    function seenRepliesMap() {
+      try { return JSON.parse(localStorage.getItem('pdfhot_seen_replies') || '{}'); } catch (_) { return {}; }
+    }
+    function markReplySeen(user) {
+      if (!user || !user.user_reply_at) return;
+      const m = seenRepliesMap();
+      m[user.id] = user.user_reply_at;
+      try { localStorage.setItem('pdfhot_seen_replies', JSON.stringify(m)); } catch (_) {}
+    }
+    function isReplyUnseen(user) {
+      return !!(user.user_reply && user.user_reply_at && seenRepliesMap()[user.id] !== user.user_reply_at);
+    }
+    function updateReplyBadge() {
+      const unseen = (currentUser && currentUser.role === 'admin') ? profileCache.filter(isReplyUnseen).length : 0;
+      ['adminNavBtn', 'adminNavBtnMobile'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        let dot = btn.querySelector('.reply-dot');
+        if (!dot) {
+          dot = document.createElement('span');
+          dot.className = 'reply-dot hidden min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold items-center justify-center';
+          dot.style.display = 'none';
+          btn.appendChild(dot);
+        }
+        dot.textContent = unseen;
+        dot.style.display = unseen ? 'inline-flex' : 'none';
+        dot.style.marginInlineStart = '6px';
+      });
+    }
+
+    async function pollAdminReplies() {
+      if (!currentUser || currentUser.role !== 'admin') return;
+      const before = knownReplyKeys;
+      await refreshProfiles();
+      const now = {};
+      profileCache.forEach(u => { if (u.user_reply_at) now[u.id] = u.user_reply_at; });
+      if (before) {
+        profileCache.forEach(u => {
+          if (u.user_reply_at && before[u.id] !== u.user_reply_at) showToast(`↩ پاسخ جدید از «${u.username}»`, 'info');
+        });
+      }
+      knownReplyKeys = now;
+      updateReplyBadge();
+      if (currentTab === 'admin' && userMessageModal.classList.contains('hidden')) renderAdmin();
+    }
+    function startAdminReplyPolling() {
+      stopAdminReplyPolling();
+      if (!currentUser || currentUser.role !== 'admin') return;
+      knownReplyKeys = {};
+      profileCache.forEach(u => { if (u.user_reply_at) knownReplyKeys[u.id] = u.user_reply_at; });
+      updateReplyBadge();
+      adminReplyTimer = setInterval(pollAdminReplies, 30000);
+    }
+    function stopAdminReplyPolling() {
+      if (adminReplyTimer) { clearInterval(adminReplyTimer); adminReplyTimer = null; }
+      knownReplyKeys = null;
+    }
 
     /* ===== ADMIN PANEL ===== */
     function renderAdmin() {
@@ -1890,6 +2094,7 @@
               <div class="flex items-center gap-1.5 flex-wrap">
                 <p class="font-bold text-xs text-white truncate">${escapeHtml(user.username)}</p>
                 <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded font-bold ${user.role === 'admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'} shrink-0">${user.role === 'admin' ? '🔐' : '👤'}</span>
+                ${user.user_reply ? (isReplyUnseen(user) ? '<span class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0 animate-pulse">↩ پاسخ جدید</span>' : '<span class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-emerald-500/15 text-emerald-300 shrink-0">↩ پاسخ داده</span>') : ''}
               </div>
               <p class="text-[9px] sm:text-[10px] text-gray-400 font-mono truncate">${fmtDate(user.created_at)}</p>
             </div>
